@@ -5,7 +5,7 @@
 // ============================================================
 // OWNER CONFIG — GANTI EMAIL INI DENGAN EMAIL OWNER
 // ============================================================
-const OWNER_EMAIL = "owner@doominiks.com";
+const OWNER_EMAIL = "niksstoree@gmail.com";
 // ============================================================
 
 let fb, currentUser, currentUserData;
