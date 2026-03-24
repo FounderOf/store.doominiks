@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DOOMINIKS STORE</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment, getDocs, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    // ============================================================
+    // FIREBASE CONFIG — GANTI DENGAN KONFIGURASI ANDA
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      authDomain: "doominiks-store.firebaseapp.com",
+      projectId: "doominiks-store",
+      storageBucket: "doominiks-store.appspot.com",
+      messagingSenderId: "000000000000",
+      appId: "1:000000000000:web:xxxxxxxxxxxxxxxx"
+    };
+    // ============================================================
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    window._firebase = { auth, db, storage, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword,
+      doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment, getDocs, where, serverTimestamp, ref, uploadBytes, getDownloadURL };
+  </script>
+</head>
+<body>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loading-screen">
+  <div class="loading-bg"></div>
+  <div class="loading-content">
+    <div class="loading-logo">
+      <div class="logo-hex">
+        <span class="logo-icon"><i class="fas fa-crown"></i></span>
+      </div>
+      <div class="logo-rings">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+      </div>
+    </div>
+    <h1 class="loading-title">DOOMINIKS</h1>
+    <p class="loading-sub">STORE</p>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+    <p class="loading-text" id="loadingText">Initializing systems...</p>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" style="display:none">
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo" onclick="showPage('home')">
+      <i class="fas fa-crown"></i>
+      <span>DOOMINIKS</span>
+      <span class="nav-store">STORE</span>
+    </div>
+    <div class="nav-links">
+      <a onclick="showPage('home')" class="nav-link"><i class="fas fa-home"></i> Home</a>
+      <a onclick="showPage('products')" class="nav-link"><i class="fas fa-store"></i> Products</a>
+      <a onclick="showPage('reviews')" class="nav-link"><i class="fas fa-star"></i> Reviews</a>
+      <a id="discordNavLink" href="#" target="_blank" class="nav-link"><i class="fab fa-discord"></i> Discord</a>
+    </div>
+    <div class="nav-right">
+      <div id="navGuest" class="nav-auth-btns">
+        <button class="btn-outline-red" onclick="showModal('loginModal')">Login</button>
+        <button class="btn-red" onclick="showModal('registerModal')">Register</button>
+      </div>
+      <div id="navUser" style="display:none" class="nav-user">
+        <div class="nav-coin"><i class="fas fa-coins"></i> <span id="navCoinBal">0</span></div>
+        <div class="nav-avatar" onclick="showPage('profile')">
+          <img id="navAvatar" src="" alt=""/>
+          <span id="navUsername">User</span>
+        </div>
+        <button class="btn-icon" onclick="showPage('chat')"><i class="fas fa-comment-dots"></i></button>
+        <button class="btn-icon" onclick="showPage('orders')"><i class="fas fa-box"></i></button>
+        <button class="btn-icon red" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileNav()"><i class="fas fa-bars"></i></button>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div id="mobileNav" class="mobile-nav">
+    <a onclick="showPage('home');toggleMobileNav()">Home</a>
+    <a onclick="showPage('products');toggleMobileNav()">Products</a>
+    <a onclick="showPage('reviews');toggleMobileNav()">Reviews</a>
+    <a id="discordMobileLink" href="#" target="_blank">Discord</a>
+  </div>
+
+  <!-- ===== PAGES ===== -->
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-particles" id="heroParticles"></div>
+      <div class="hero-content">
+        <div class="hero-badge">⚡ OFFICIAL STORE</div>
+        <h1 class="hero-title">DOOMINIKS<br/><span class="glow-text">STORE</span></h1>
+        <p class="hero-sub">Premium digital products with trusted service</p>
+        <div class="hero-btns">
+          <button class="btn-red-lg" onclick="showPage('products')"><i class="fas fa-store"></i> Shop Now</button>
+          <a id="heroDiscordBtn" href="#" target="_blank" class="btn-outline-red-lg"><i class="fab fa-discord"></i> Join Discord</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span id="statProducts">0</span><small>Products</small></div>
+          <div class="stat"><span id="statOrders">0</span><small>Orders</small></div>
+          <div class="stat"><span id="statReviews">0</span><small>Reviews</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-featured">
+      <div class="container">
+        <h2 class="section-title"><span class="glow-text">Featured</span> Products</h2>
+        <div class="products-grid" id="featuredProducts"></div>
+      </div>
+    </section>
+
+    <section class="section-reviews">
+      <div class="container">
+        <h2 class="section-title">Customer <span class="glow-text">Reviews</span></h2>
+        <div class="reviews-scroll" id="homeReviews"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PRODUCTS PAGE -->
+  <div id="page-products" class="page">
+    <div class="page-header">
+      <h1>Our <span class="glow-text">Products</span></h1>
+    </div>
+    <div class="container">
+      <div class="products-filter">
+        <input type="text" id="searchProduct" placeholder="Search products..." class="input-dark" oninput="filterProducts()"/>
+      </div>
+      <div class="products-grid" id="allProducts"></div>
+    </div>
+  </div>
+
+  <!-- REVIEWS PAGE -->
+  <div id="page-reviews" class="page">
+    <div class="page-header">
+      <h1>Customer <span class="glow-text">Reviews</span></h1>
+    </div>
+    <div class="container">
+      <div class="reviews-grid" id="allReviews"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page">
+    <div class="container">
+      <div class="profile-card">
+        <div class="profile-banner"></div>
+        <div class="profile-info">
+          <div class="profile-avatar-wrap">
+            <img id="profileAvatar" src="" alt=""/>
+            <div class="profile-badges" id="profileBadges"></div>
+          </div>
+          <div class="profile-details">
+            <h2 id="profileUsername">Username</h2>
+            <p id="profileEmail" class="text-muted"></p>
+            <div class="profile-stats">
+              <div class="pstat"><i class="fas fa-wallet"></i> Rp <span id="profileBalance">0</span></div>
+              <div class="pstat"><i class="fas fa-coins"></i> <span id="profileCoins">0</span> Coins</div>
+            </div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-red" onclick="showModal('topupModal')"><i class="fas fa-plus-circle"></i> Top Up Balance</button>
+          <button class="btn-red" onclick="showModal('topupCoinModal')"><i class="fas fa-coins"></i> Top Up Coins</button>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3>My Orders</h3>
+        <div id="myOrders"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS PAGE -->
+  <div id="page-orders" class="page">
+    <div class="page-header"><h1>My <span class="glow-text">Orders</span></h1></div>
+    <div class="container">
+      <div id="ordersListUser"></div>
+    </div>
+  </div>
+
+  <!-- CHAT PAGE -->
+  <div id="page-chat" class="page">
+    <div class="page-header"><h1>Private <span class="glow-text">Chat</span></h1></div>
+    <div class="container">
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Type a message..." class="input-dark" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="btn-red" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== OWNER PANEL ===== -->
+  <div id="page-owner" class="page owner-page">
+    <div class="page-header">
+      <h1><i class="fas fa-crown"></i> Owner <span class="glow-text">Panel</span></h1>
+    </div>
+    <div class="container">
+      <div class="owner-tabs">
+        <button class="otab active" onclick="ownerTab('dashboard')"><i class="fas fa-chart-bar"></i> Dashboard</button>
+        <button class="otab" onclick="ownerTab('manageProducts')"><i class="fas fa-box"></i> Products</button>
+        <button class="otab" onclick="ownerTab('manageOrders')"><i class="fas fa-list"></i> Orders</button>
+        <button class="otab" onclick="ownerTab('manageTransactions')"><i class="fas fa-receipt"></i> Transactions</button>
+        <button class="otab" onclick="ownerTab('manageUsers')"><i class="fas fa-users"></i> Users</button>
+        <button class="otab" onclick="ownerTab('manageChats')"><i class="fas fa-comments"></i> Chats</button>
+        <button class="otab" onclick="ownerTab('manageReviews')"><i class="fas fa-star"></i> Reviews</button>
+        <button class="otab" onclick="ownerTab('manageDiscount')"><i class="fas fa-tag"></i> Discounts</button>
+        <button class="otab" onclick="ownerTab('manageSettings')"><i class="fas fa-cog"></i> Settings</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div id="otab-dashboard" class="owner-panel-content active">
+        <div class="dashboard-stats">
+          <div class="dstat-card"><i class="fas fa-shopping-bag"></i><div><span id="ds-orders">0</span><small>Total Orders</small></div></div>
+          <div class="dstat-card"><i class="fas fa-money-bill-wave"></i><div><span id="ds-revenue">Rp 0</span><small>Revenue</small></div></div>
+          <div class="dstat-card"><i class="fas fa-users"></i><div><span id="ds-users">0</span><small>Users</small></div></div>
+          <div class="dstat-card"><i class="fas fa-box-open"></i><div><span id="ds-products">0</span><small>Products</small></div></div>
+        </div>
+        <h3>Recent Orders</h3>
+        <div id="recentOrdersList"></div>
+      </div>
+
+      <!-- Manage Products -->
+      <div id="otab-manageProducts" class="owner-panel-content">
+        <button class="btn-red mb-2" onclick="showModal('addProductModal')"><i class="fas fa-plus"></i> Add Product</button>
+        <div id="ownerProductsList"></div>
+      </div>
+
+      <!-- Manage Orders -->
+      <div id="otab-manageOrders" class="owner-panel-content">
+        <div id="ownerOrdersList"></div>
+      </div>
+
+      <!-- Manage Transactions -->
+      <div id="otab-manageTransactions" class="owner-panel-content">
+        <h3>Transaction History</h3>
+        <div id="ownerTransactionsList"></div>
+      </div>
+
+      <!-- Manage Users -->
+      <div id="otab-manageUsers" class="owner-panel-content">
+        <div id="ownerUsersList"></div>
+      </div>
+
+      <!-- Manage Chats -->
+      <div id="otab-manageChats" class="owner-panel-content">
+        <div class="owner-chat-layout">
+          <div class="chat-user-list" id="ownerChatUserList"></div>
+          <div class="owner-chat-area">
+            <div class="chat-messages" id="ownerChatMessages"></div>
+            <div class="chat-input-row">
+              <input type="text" id="ownerChatInput" placeholder="Reply..." class="input-dark" onkeydown="if(event.key==='Enter')ownerSendChat()"/>
+              <button class="btn-red" onclick="ownerSendChat()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Reviews -->
+      <div id="otab-manageReviews" class="owner-panel-content">
+        <div id="ownerReviewsList"></div>
+      </div>
+
+      <!-- Manage Discounts -->
+      <div id="otab-manageDiscount" class="owner-panel-content">
+        <button class="btn-red mb-2" onclick="showModal('addDiscountModal')"><i class="fas fa-plus"></i> Add Discount Code</button>
+        <div id="ownerDiscountList"></div>
+      </div>
+
+      <!-- Settings -->
+      <div id="otab-manageSettings" class="owner-panel-content">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3><i class="fas fa-user-cog"></i> Owner Account</h3>
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="ownerUsernameInput" class="input-dark" placeholder="Owner username"/>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="ownerPasswordInput" class="input-dark" placeholder="New password"/>
+            </div>
+            <button class="btn-red" onclick="saveOwnerAccount()">Save Account</button>
+          </div>
+          <div class="settings-card">
+            <h3><i class="fab fa-discord"></i> Discord Link</h3>
+            <div class="form-group">
+              <input type="text" id="discordLinkInput" class="input-dark" placeholder="https://discord.gg/..."/>
+            </div>
+            <button class="btn-red" onclick="saveDiscordLink()">Save</button>
+          </div>
+          <div class="settings-card">
+            <h3><i class="fas fa-university"></i> Bank Account</h3>
+            <div class="form-group">
+              <label>Bank Name</label>
+              <input type="text" id="bankNameInput" class="input-dark" placeholder="BCA / BRI / Mandiri..."/>
+            </div>
+            <div class="form-group">
+              <label>Account Number</label>
+              <input type="text" id="bankNumberInput" class="input-dark" placeholder="1234567890"/>
+            </div>
+            <div class="form-group">
+              <label>Account Name</label>
+              <input type="text" id="bankOwnerName" class="input-dark" placeholder="Name"/>
+            </div>
+            <button class="btn-red" onclick="saveBankSettings()">Save</button>
+          </div>
+          <div class="settings-card">
+            <h3><i class="fas fa-mobile-alt"></i> E-Wallet</h3>
+            <div class="form-group">
+              <label>GoPay / OVO / Dana</label>
+              <input type="text" id="ewalletNameInput" class="input-dark" placeholder="GoPay / OVO / Dana"/>
+            </div>
+            <div class="form-group">
+              <label>Number</label>
+              <input type="text" id="ewalletNumberInput" class="input-dark" placeholder="0812345678"/>
+            </div>
+            <div class="form-group">
+              <label>Account Name</label>
+              <input type="text" id="ewalletOwnerName" class="input-dark" placeholder="Name"/>
+            </div>
+            <button class="btn-red" onclick="saveEwalletSettings()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+
+  <!-- LOGIN -->
+  <div id="loginModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Login</h2><button onclick="closeModal('loginModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="form-group"><label>Username or Email</label><input type="text" id="loginEmail" class="input-dark" placeholder="email@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="loginPassword" class="input-dark" placeholder="Password"/></div>
+      <div id="loginError" class="error-msg"></div>
+      <button class="btn-red full" onclick="loginUser()">Login</button>
+      <p class="modal-switch">No account? <a onclick="closeModal('loginModal');showModal('registerModal')">Register here</a></p>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Create Account</h2><button onclick="closeModal('registerModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="form-group"><label>Username</label><input type="text" id="regUsername" class="input-dark" placeholder="Username"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" class="input-dark" placeholder="email@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="regPassword" class="input-dark" placeholder="Minimum 6 characters"/></div>
+      <div id="regError" class="error-msg"></div>
+      <button class="btn-red full" onclick="registerUser()">Create Account</button>
+      <p class="modal-switch">Already have account? <a onclick="closeModal('registerModal');showModal('loginModal')">Login here</a></p>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT -->
+  <div id="addProductModal" class="modal">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2>Add Product</h2><button onclick="closeModal('addProductModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="form-group"><label>Product Name</label><input type="text" id="pName" class="input-dark" placeholder="Product name"/></div>
+      <div class="form-group"><label>Description</label><textarea id="pDesc" class="input-dark" rows="3" placeholder="Description..."></textarea></div>
+      <div class="form-group"><label>Price (IDR)</label><input type="number" id="pPrice" class="input-dark" placeholder="50000"/></div>
+      <div class="form-group"><label>Price (Coins)</label><input type="number" id="pCoinPrice" class="input-dark" placeholder="100"/></div>
+      <div class="form-group"><label>Stock</label><input type="number" id="pStock" class="input-dark" placeholder="10"/></div>
+      <div class="form-group"><label>Category</label><input type="text" id="pCategory" class="input-dark" placeholder="Game / Software / etc"/></div>
+      <div class="form-group"><label>Product Image</label><input type="file" id="pImage" class="input-dark" accept="image/*"/></div>
+      <div id="addProductError" class="error-msg"></div>
+      <button class="btn-red full" onclick="addProduct()">Add Product</button>
+    </div>
+  </div>
+
+  <!-- EDIT PRODUCT -->
+  <div id="editProductModal" class="modal">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2>Edit Product</h2><button onclick="closeModal('editProductModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <input type="hidden" id="editPid"/>
+      <div class="form-group"><label>Product Name</label><input type="text" id="editPName" class="input-dark"/></div>
+      <div class="form-group"><label>Description</label><textarea id="editPDesc" class="input-dark" rows="3"></textarea></div>
+      <div class="form-group"><label>Price (IDR)</label><input type="number" id="editPPrice" class="input-dark"/></div>
+      <div class="form-group"><label>Price (Coins)</label><input type="number" id="editPCoinPrice" class="input-dark"/></div>
+      <div class="form-group"><label>Stock</label><input type="number" id="editPStock" class="input-dark"/></div>
+      <div class="form-group"><label>Category</label><input type="text" id="editPCategory" class="input-dark"/></div>
+      <div class="form-group"><label>New Image (optional)</label><input type="file" id="editPImage" class="input-dark" accept="image/*"/></div>
+      <button class="btn-red full" onclick="saveEditProduct()">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL / BUY -->
+  <div id="productModal" class="modal">
+    <div class="modal-box wide">
+      <div class="modal-header"><h2 id="pdTitle">Product</h2><button onclick="closeModal('productModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <img id="pdImage" src="" alt="" class="product-modal-img"/>
+      <p id="pdDesc" class="text-muted mt-1"></p>
+      <div class="product-modal-info">
+        <div class="pi-row"><span>Price</span><strong id="pdPrice"></strong></div>
+        <div class="pi-row"><span>Coin Price</span><strong id="pdCoinPrice"></strong></div>
+        <div class="pi-row"><span>Stock</span><strong id="pdStock"></strong></div>
+        <div class="pi-row"><span>Category</span><strong id="pdCategory"></strong></div>
+      </div>
+      <div class="form-group">
+        <label>Discount Code (optional)</label>
+        <div class="input-row"><input type="text" id="discountCode" class="input-dark" placeholder="Enter code"/><button class="btn-outline-red" onclick="applyDiscount()">Apply</button></div>
+        <small id="discountMsg" class="text-green"></small>
+      </div>
+      <div class="buy-btns">
+        <button class="btn-red" onclick="buyProduct('idr')"><i class="fas fa-money-bill"></i> Buy with IDR</button>
+        <button class="btn-outline-red" onclick="buyProduct('coin')"><i class="fas fa-coins"></i> Buy with Coins</button>
+      </div>
+      <div class="review-section mt-3">
+        <h4>Reviews</h4>
+        <div id="productReviews"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2><i class="fas fa-credit-card"></i> Payment</h2><button onclick="closeModal('paymentModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="payment-steps">
+        <div class="pstep active" id="pstep1">1. Details</div>
+        <div class="pstep" id="pstep2">2. Pay</div>
+        <div class="pstep" id="pstep3">3. Upload Proof</div>
+      </div>
+      <div id="payStep1">
+        <div class="payment-summary" id="paymentSummary"></div>
+        <div class="form-group mt-2">
+          <label>Payment Method</label>
+          <div class="method-btns">
+            <button class="method-btn active" onclick="selectMethod('bank',this)"><i class="fas fa-university"></i> Bank Transfer</button>
+            <button class="method-btn" onclick="selectMethod('ewallet',this)"><i class="fas fa-mobile-alt"></i> E-Wallet</button>
+          </div>
+        </div>
+        <button class="btn-red full mt-2" onclick="goPayStep2()">Continue</button>
+      </div>
+      <div id="payStep2" style="display:none">
+        <div class="payment-info-box" id="paymentInfoBox"></div>
+        <div class="countdown-box">Transfer before: <strong id="payCountdown">15:00</strong></div>
+        <button class="btn-red full mt-2" onclick="goPayStep3()">I've Paid</button>
+      </div>
+      <div id="payStep3" style="display:none">
+        <div class="form-group">
+          <label>Upload Payment Proof</label>
+          <input type="file" id="proofUpload" class="input-dark" accept="image/*"/>
+        </div>
+        <div id="payError" class="error-msg"></div>
+        <button class="btn-red full" onclick="submitPayment()">Submit Proof</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPUP BALANCE MODAL -->
+  <div id="topupModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Top Up Balance</h2><button onclick="closeModal('topupModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="form-group"><label>Amount (IDR)</label><input type="number" id="topupAmount" class="input-dark" placeholder="50000"/></div>
+      <div class="form-group">
+        <label>Payment Method</label>
+        <div class="method-btns">
+          <button class="method-btn active" onclick="selectMethod('bank',this,'topup')"><i class="fas fa-university"></i> Bank Transfer</button>
+          <button class="method-btn" onclick="selectMethod('ewallet',this,'topup')"><i class="fas fa-mobile-alt"></i> E-Wallet</button>
+        </div>
+      </div>
+      <button class="btn-red full" onclick="initiateTopup('balance')">Continue</button>
+    </div>
+  </div>
+
+  <!-- TOPUP COIN MODAL -->
+  <div id="topupCoinModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Top Up Coins</h2><button onclick="closeModal('topupCoinModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="coin-packages">
+        <div class="coin-pkg" onclick="selectCoinPkg(10000, 100, this)"><i class="fas fa-coins"></i><span>100 Coins</span><small>Rp 10.000</small></div>
+        <div class="coin-pkg" onclick="selectCoinPkg(25000, 275, this)"><i class="fas fa-coins"></i><span>275 Coins</span><small>Rp 25.000</small></div>
+        <div class="coin-pkg" onclick="selectCoinPkg(50000, 600, this)"><i class="fas fa-coins"></i><span>600 Coins</span><small>Rp 50.000</small></div>
+        <div class="coin-pkg" onclick="selectCoinPkg(100000, 1300, this)"><i class="fas fa-coins"></i><span>1300 Coins</span><small>Rp 100.000</small></div>
+      </div>
+      <input type="hidden" id="selectedCoinPkg" value=""/>
+      <div class="form-group mt-2">
+        <label>Payment Method</label>
+        <div class="method-btns">
+          <button class="method-btn active" onclick="selectMethod('bank',this,'coin')"><i class="fas fa-university"></i> Bank Transfer</button>
+          <button class="method-btn" onclick="selectMethod('ewallet',this,'coin')"><i class="fas fa-mobile-alt"></i> E-Wallet</button>
+        </div>
+      </div>
+      <button class="btn-red full mt-2" onclick="initiateTopup('coin')">Continue</button>
+    </div>
+  </div>
+
+  <!-- TOPUP PAYMENT PROOF MODAL -->
+  <div id="topupPayModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Complete Payment</h2><button onclick="closeModal('topupPayModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="payment-info-box" id="topupPayInfo"></div>
+      <div class="countdown-box">Transfer before: <strong id="topupCountdown">15:00</strong></div>
+      <div class="form-group mt-2">
+        <label>Upload Payment Proof</label>
+        <input type="file" id="topupProof" class="input-dark" accept="image/*"/>
+      </div>
+      <div id="topupError" class="error-msg"></div>
+      <button class="btn-red full" onclick="submitTopupProof()">Submit Proof</button>
+    </div>
+  </div>
+
+  <!-- ADD DISCOUNT MODAL -->
+  <div id="addDiscountModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Add Discount Code</h2><button onclick="closeModal('addDiscountModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <div class="form-group"><label>Code</label><input type="text" id="dcCode" class="input-dark" placeholder="SAVE20"/></div>
+      <div class="form-group"><label>Discount (%)</label><input type="number" id="dcPercent" class="input-dark" placeholder="20"/></div>
+      <div class="form-group"><label>Max Uses</label><input type="number" id="dcMaxUses" class="input-dark" placeholder="100"/></div>
+      <button class="btn-red full" onclick="addDiscount()">Add Code</button>
+    </div>
+  </div>
+
+  <!-- GIVE BADGE MODAL -->
+  <div id="giveBadgeModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Give Badge</h2><button onclick="closeModal('giveBadgeModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <input type="hidden" id="badgeTargetUid"/>
+      <div class="badge-options">
+        <div class="badge-opt" onclick="selectBadge('warrior',this)">⚔️ Warrior</div>
+        <div class="badge-opt" onclick="selectBadge('elite',this)">🛡️ Elite</div>
+        <div class="badge-opt" onclick="selectBadge('master',this)">🏆 Master</div>
+        <div class="badge-opt" onclick="selectBadge('grandmaster',this)">👑 Grandmaster</div>
+        <div class="badge-opt" onclick="selectBadge('mythical',this)">🌟 Mythical</div>
+      </div>
+      <input type="hidden" id="selectedBadge"/>
+      <button class="btn-red full mt-2" onclick="giveBadge()">Give Badge</button>
+    </div>
+  </div>
+
+  <!-- REVIEW MODAL -->
+  <div id="reviewModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-header"><h2>Write Review</h2><button onclick="closeModal('reviewModal')" class="modal-close"><i class="fas fa-times"></i></button></div>
+      <input type="hidden" id="reviewOrderId"/>
+      <input type="hidden" id="reviewProductId"/>
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="star-rating" id="starRating">
+          <span class="star" onclick="setRating(1)">★</span>
+          <span class="star" onclick="setRating(2)">★</span>
+          <span class="star" onclick="setRating(3)">★</span>
+          <span class="star" onclick="setRating(4)">★</span>
+          <span class="star" onclick="setRating(5)">★</span>
+        </div>
+      </div>
+      <div class="form-group"><label>Review</label><textarea id="reviewText" class="input-dark" rows="3" placeholder="Share your experience..."></textarea></div>
+      <button class="btn-red full" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="toast"></div>
+
+</div><!-- /app -->
+
+<script src="script.js"></script>
+</body>
+</html>
