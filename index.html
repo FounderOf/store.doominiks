@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOOMINIKS STORE - Premium Gaming Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <h1 class="store-title">DOOMINIKS</h1>
+                <p class="store-subtitle">STORE</p>
+            </div>
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Initializing Store...</p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to DOOMINIKS STORE</h2>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="register">Register</button>
+                </div>
+                
+                <div id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <button class="btn-primary" onclick="login()">Login</button>
+                </div>
+                
+                <div id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Choose a password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="Confirm your password">
+                    </div>
+                    <button class="btn-primary" onclick="register()">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="logo">DOOMINIKS STORE</h1>
+            </div>
+            <div class="header-center">
+                <nav class="nav">
+                    <button class="nav-btn active" data-panel="products"><i class="fas fa-store"></i> Products</button>
+                    <button class="nav-btn" data-panel="reviews"><i class="fas fa-star"></i> Reviews</button>
+                    <button class="nav-btn" data-panel="chat"><i class="fas fa-comments"></i> Chat</button>
+                    <button class="nav-btn" data-panel="orders"><i class="fas fa-box"></i> Orders</button>
+                    <button class="nav-btn owner-only" data-panel="owner" style="display: none;"><i class="fas fa-crown"></i> Owner Panel</button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-info" onclick="toggleProfileMenu()">
+                    <span class="user-badge" id="userBadge"></span>
+                    <span class="username" id="headerUsername"></span>
+                    <div class="balance-display">
+                        <span class="coins"><i class="fas fa-coins"></i> <span id="headerCoins">0</span></span>
+                        <span class="idr"><i class="fas fa-money-bill"></i> Rp <span id="headerBalance">0</span></span>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <!-- Profile Dropdown -->
+        <div id="profileMenu" class="profile-menu">
+            <div class="profile-header">
+                <span class="profile-badge" id="profileBadge"></span>
+                <h3 id="profileUsername"></h3>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <i class="fas fa-coins"></i>
+                    <span>Coins: <strong id="profileCoins">0</strong></span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-money-bill"></i>
+                    <span>Balance: Rp <strong id="profileBalance">0</strong></span>
+                </div>
+            </div>
+            <button class="btn-topup" onclick="openTopupModal()"><i class="fas fa-plus-circle"></i> Top Up</button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Products Panel -->
+            <div id="productsPanel" class="panel active">
+                <div class="panel-header">
+                    <h2><i class="fas fa-store"></i> Products</h2>
+                </div>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Reviews Panel -->
+            <div id="reviewsPanel" class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-star"></i> Reviews & Ratings</h2>
+                </div>
+                <div class="reviews-container" id="reviewsContainer">
+                    <!-- Reviews will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Chat Panel -->
+            <div id="chatPanel" class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-comments"></i> Chat with Support</h2>
+                </div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatMessageInput" placeholder="Type your message...">
+                        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Panel -->
+            <div id="ordersPanel" class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-box"></i> My Orders</h2>
+                </div>
+                <div class="orders-container" id="ordersContainer">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Owner Panel -->
+            <div id="ownerPanel" class="panel owner-only" style="display: none;">
+                <div class="panel-header">
+                    <h2><i class="fas fa-crown"></i> Owner Dashboard</h2>
+                </div>
+                <div class="owner-tabs">
+                    <button class="owner-tab active" data-tab="manage-products">Manage Products</button>
+                    <button class="owner-tab" data-tab="manage-orders">Orders</button>
+                    <button class="owner-tab" data-tab="manage-badges">Manage Badges</button>
+                    <button class="owner-tab" data-tab="settings">Settings</button>
+                    <button class="owner-tab" data-tab="transactions">Transactions</button>
+                </div>
+                
+                <div id="manageProductsTab" class="owner-tab-content active">
+                    <div class="owner-section">
+                        <h3>Add New Product</h3>
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="productName">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="productDescription"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (IDR)</label>
+                            <input type="number" id="productPrice">
+                        </div>
+                        <div class="form-group">
+                            <label>Price (Coins)</label>
+                            <input type="number" id="productPriceCoins">
+                        </div>
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number" id="productStock">
+                        </div>
+                        <div class="form-group">
+                            <label>Discount (%)</label>
+                            <input type="number" id="productDiscount" min="0" max="100" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Product Image</label>
+                            <input type="file" id="productImage" accept="image/*">
+                        </div>
+                        <button class="btn-primary" onclick="addProduct()">Add Product</button>
+                    </div>
+                    <div class="owner-section">
+                        <h3>Existing Products</h3>
+                        <div id="ownerProductsList"></div>
+                    </div>
+                </div>
+                
+                <div id="manageOrdersTab" class="owner-tab-content">
+                    <div class="owner-section">
+                        <h3>Customer Orders</h3>
+                        <div id="ownerOrdersList"></div>
+                    </div>
+                </div>
+                
+                <div id="manageBadgesTab" class="owner-tab-content">
+                    <div class="owner-section">
+                        <h3>Give Badge to User</h3>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="badgeUsername">
+                        </div>
+                        <div class="form-group">
+                            <label>Badge Type</label>
+                            <select id="badgeType">
+                                <option value="warrior">⚔️ Warrior</option>
+                                <option value="elite">💎 Elite</option>
+                                <option value="master">🏆 Master</option>
+                                <option value="grandmaster">👑 Grandmaster</option>
+                                <option value="mythical">🔮 Mythical</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" onclick="giveBadge()">Give Badge</button>
+                    </div>
+                </div>
+                
+                <div id="settingsTab" class="owner-tab-content">
+                    <div class="owner-section">
+                        <h3>Account Settings</h3>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="ownerUsername">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="ownerNewPassword">
+                        </div>
+                        <button class="btn-primary" onclick="updateOwnerAccount()">Update Account</button>
+                    </div>
+                    <div class="owner-section">
+                        <h3>Payment Settings</h3>
+                        <div class="form-group">
+                            <label>Bank Name</label>
+                            <input type="text" id="bankName">
+                        </div>
+                        <div class="form-group">
+                            <label>Bank Account Number</label>
+                            <input type="text" id="bankAccount">
+                        </div>
+                        <div class="form-group">
+                            <label>E-Wallet Type</label>
+                            <input type="text" id="ewalletType" placeholder="e.g., GoPay, OVO, DANA">
+                        </div>
+                        <div class="form-group">
+                            <label>E-Wallet Number</label>
+                            <input type="text" id="ewalletNumber">
+                        </div>
+                        <button class="btn-primary" onclick="updatePaymentSettings()">Save Payment Settings</button>
+                    </div>
+                    <div class="owner-section">
+                        <h3>Discord Settings</h3>
+                        <div class="form-group">
+                            <label>Discord Invite Link</label>
+                            <input type="text" id="discordLink">
+                        </div>
+                        <button class="btn-primary" onclick="updateDiscordLink()">Save Discord Link</button>
+                    </div>
+                </div>
+                
+                <div id="transactionsTab" class="owner-tab-content">
+                    <div class="owner-section">
+                        <h3>Transaction History</h3>
+                        <div id="transactionsList"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Discord Button -->
+        <a id="discordButton" href="#" target="_blank" class="discord-btn" style="display: none;">
+            <i class="fab fa-discord"></i>
+        </a>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="modal-close" onclick="closeProductModal()">&times;</span>
+            <div class="modal-body">
+                <div class="product-detail" id="productDetail">
+                    <!-- Product details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePaymentModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Complete Payment</h2>
+            </div>
+            <div class="modal-body">
+                <div id="paymentContent">
+                    <!-- Payment content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Up Modal -->
+    <div id="topupModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeTopupModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Top Up Balance</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Amount (IDR)</label>
+                    <input type="number" id="topupAmount" placeholder="Enter amount">
+                </div>
+                <button class="btn-primary" onclick="processTopup()">Proceed to Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+</html>
