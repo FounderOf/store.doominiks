@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>DOOMINIKS STORE | Premium Gaming Shop</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0a0a0f;
+      color: #eef5ff;
+      overflow-x: hidden;
+    }
+
+    /* LOADING SCREEN AESTHETIC */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #0f0f1a, #030307);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s;
+      gap: 2rem;
+    }
+    .loading-spinner {
+      width: 70px;
+      height: 70px;
+      border: 5px solid rgba(220, 38, 38, 0.2);
+      border-top: 5px solid #ef4444;
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+      box-shadow: 0 0 20px #ef4444aa;
+    }
+    .loading-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #ef4444, #ff8c8c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 8px #ef444466;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* GLOW MERAH DI PANEL */
+    .glow-red {
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.6), 0 0 5px rgba(239, 68, 68, 0.4);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      transition: all 0.2s;
+    }
+    .glow-red:hover {
+      box-shadow: 0 0 18px #ef4444cc;
+    }
+
+    /* MAIN APP CONTAINER */
+    .app-container {
+      display: none;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* HEADER & NAV */
+    .nav-glow {
+      background: #111117e6;
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 0.8rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #fff, #ef4444);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: #ccd6f6;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    .nav-btn.active, .nav-btn:hover {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 0 10px #ef4444;
+    }
+    .badge-owner {
+      background: #ef4444;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* PANELS GRID */
+    .panel {
+      background: #0e0e14cc;
+      backdrop-filter: blur(8px);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      transition: all 0.2s;
+    }
+    .panel-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 5px solid #ef4444;
+      padding-left: 1rem;
+    }
+
+    /* PRODUCT GRID */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .product-card {
+      background: #1a1a24;
+      border-radius: 1.2rem;
+      overflow: hidden;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .product-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: #2a2a35;
+    }
+    .product-info {
+      padding: 1rem;
+    }
+    .product-price {
+      color: #ef4444;
+      font-weight: bold;
+    }
+
+    /* FORM & INPUTS */
+    input, textarea, select {
+      background: #1e1e2a;
+      border: 1px solid #2c2c3a;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem;
+      color: white;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+    button {
+      background: #ef4444;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:active { transform: scale(0.97);}
+    .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;}
+
+    /* CHAT */
+    .chat-window {
+      height: 350px;
+      overflow-y: auto;
+      background: #0b0b10;
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+    .chat-message {
+      margin-bottom: 0.8rem;
+      background: #1f1f2b;
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      width: fit-content;
+      max-width: 80%;
+    }
+    .chat-message.admin {
+      background: #ef444430;
+      border-left: 3px solid #ef4444;
+    }
+
+    /* BADGE */
+    .badge-item {
+      background: linear-gradient(145deg, #2a2a35, #1a1a24);
+      border-radius: 2rem;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin: 0.2rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { justify-content: center; }
+      .app-container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">DOOMINIKS STORE</div>
+  <div style="color:#aaa">loading experience...</div>
+</div>
+
+<!-- AUTH SECTION (login/register) -->
+<div id="authSection" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #0a0a0f;">
+  <div class="panel glow-red" style="width: 400px; text-align: center;">
+    <h2 style="margin-bottom: 1.5rem;">⚡ DOOMINIKS STORE</h2>
+    <div id="authToggle">
+      <button id="showLoginBtn" style="background:#2c2c3a;">Login</button>
+      <button id="showRegisterBtn" style="background:#2c2c3a;">Register</button>
+    </div>
+    <div id="loginForm" style="margin-top: 1.5rem;">
+      <input type="email" id="loginEmail" placeholder="Email" autocomplete="email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="doLoginBtn" style="margin-top: 1rem;">MASUK</button>
+    </div>
+    <div id="registerForm" style="display: none; margin-top: 1.5rem;">
+      <input type="text" id="regUsername" placeholder="Username">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button id="doRegisterBtn">DAFTAR</button>
+    </div>
+    <div id="authMsg" style="margin-top: 1rem; color:#ff8888;"></div>
+  </div>
+</div>
+
+<!-- MAIN APP (dashboard) -->
+<div id="mainApp" class="app-container" style="display: none;">
+  <div class="nav-glow glow-red">
+    <div class="logo"><i class="fas fa-skull"></i> DOOMINIKS</div>
+    <div class="nav-links">
+      <button class="nav-btn" data-page="home"><i class="fas fa-home"></i> Beranda</button>
+      <button class="nav-btn" data-page="shop"><i class="fas fa-store"></i> Produk</button>
+      <button class="nav-btn" data-page="orders"><i class="fas fa-truck"></i> Pesanan</button>
+      <button class="nav-btn" data-page="chat"><i class="fas fa-comments"></i> Chat Kami</button>
+      <button class="nav-btn" data-page="profile"><i class="fas fa-user"></i> Profil</button>
+      <button id="ownerPanelBtn" class="nav-btn" style="display: none; background:#ef4444;"><i class="fas fa-crown"></i> Owner Zone</button>
+      <button id="logoutBtn" class="nav-btn"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+    </div>
+  </div>
+
+  <!-- Dynamic Pages -->
+  <div id="pageContent"></div>
+</div>
+
+<script>
+  // ======================= FIREBASE CONFIG (GANTI DENGAN PUNYA ANDA) =======================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDummyKeyDoominiksStorePleaseReplace",
+    authDomain: "doominiks-store.firebaseapp.com",
+    projectId: "doominiks-store",
+    storageBucket: "doominiks-store.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abc123def456"
+  };
+  // PENTING: Ganti config di atas dengan milikmu dari Firebase Console, aktifkan Auth, Firestore, Storage
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+  const auth = firebase.auth();
+
+  // Global state
+  let currentUser = null;
+  let userRole = 'customer'; // 'owner' jika isOwner true
+  let userDocRef = null;
+
+  // Helper Functions
+  function showLoading(show) {
+    document.getElementById('loadingScreen').style.display = show ? 'flex' : 'none';
+  }
+
+  async function checkOwnerStatus(uid) {
+    const doc = await db.collection('users').doc(uid).get();
+    return doc.exists && doc.data().role === 'owner';
+  }
+
+  async function loadUserProfile(uid) {
+    const doc = await db.collection('users').doc(uid).get();
+    if(doc.exists) return doc.data();
+    return { username: 'User', balance: 0, coins: 0, badges: [] };
+  }
+
+  // Render Pages
+  async function renderPage(page) {
+    const container = document.getElementById('pageContent');
+    if(!currentUser) return;
+    const profile = await loadUserProfile(currentUser.uid);
+    if(page === 'home') {
+      container.innerHTML = `
+        <div class="panel glow-red"><h2 class="panel-title">🔥 Selamat Datang, ${profile.username}</h2>
+        <p>DOOMINIKS STORE - Topup & Jasa Gaming Terpercaya. Gunakan Coin atau IDR.</p>
+        <div class="flex-between"><span>💰 Saldo IDR: Rp ${profile.balance?.toLocaleString() || 0}</span> <span>🪙 Coin: ${profile.coins || 0}</span></div>
+        <div>🏅 Badges: ${(profile.badges || []).map(b => `<span class="badge-item">${b}</span>`).join('') || 'Tidak ada'}</div>
+        <button id="topupCoinBtn" style="margin-top:1rem;"><i class="fas fa-plus-circle"></i> Topup Coin</button>
+        </div>
+        <div class="panel glow-red"><h3 class="panel-title">⭐ Ulasan Terbaru</h3><div id="reviewsPreview">Memuat...</div></div>
+      `;
+      document.getElementById('topupCoinBtn')?.addEventListener('click', () => showTopupModal());
+      loadReviewsPreview();
+    } 
+    else if(page === 'shop') {
+      container.innerHTML = `<div class="panel glow-red"><h2 class="panel-title">🛒 Katalog Produk</h2><div id="productList" class="products-grid">Memuat...</div></div>`;
+      loadProducts();
+    }
+    else if(page === 'orders') {
+      container.innerHTML = `<div class="panel glow-red"><h2 class="panel-title">📦 Pesanan Saya</h2><div id="myOrdersList"></div></div>`;
+      loadMyOrders();
+    }
+    else if(page === 'chat') {
+      container.innerHTML = `
+        <div class="panel glow-red"><h2 class="panel-title">💬 Chat Customer Support</h2>
+        <div id="chatMessages" class="chat-window"></div>
+        <div style="display:flex; margin-top:1rem; gap:0.5rem;"><input type="text" id="chatInput" placeholder="Tulis pesan..."><button id="sendChatBtn">Kirim</button></div>
+        </div>
+      `;
+      loadChat();
+      document.getElementById('sendChatBtn')?.addEventListener('click', sendMessage);
+    }
+    else if(page === 'profile') {
+      container.innerHTML = `
+        <div class="panel glow-red"><h2 class="panel-title">👤 Profil Saya</h2>
+        <p><strong>Username:</strong> ${profile.username}</p>
+        <p><strong>Email:</strong> ${currentUser.email}</p>
+        <p><strong>Saldo IDR:</strong> Rp ${profile.balance?.toLocaleString() || 0}</p>
+        <p><strong>Coin:</strong> ${profile.coins || 0}</p>
+        <p><strong>Badges:</strong> ${(profile.badges || []).map(b => `<span class="badge-item">${b}</span>`).join('')}</p>
+        <button id="topupCoinProfileBtn">Topup Coin</button>
+        </div>
+      `;
+      document.getElementById('topupCoinProfileBtn')?.addEventListener('click', showTopupModal);
+    }
+  }
+
+  // Produk dengan stok realtime
+  async function loadProducts() {
+    const container = document.getElementById('productList');
+    if(!container) return;
+    db.collection('products').onSnapshot(snapshot => {
+      let html = '';
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        html += `
+          <div class="product-card glow-red">
+            ${p.imageUrl ? `<img src="${p.imageUrl}" class="product-img" />` : '<div class="product-img" style="display:flex;align-items:center;justify-content:center;">No Image</div>'}
+            <div class="product-info"><h3>${p.name}</h3><p>${p.desc || ''}</p><div>💰 IDR: ${p.priceIdr}</div><div>🪙 Coin: ${p.priceCoin}</div><div>📦 Stok: ${p.stock}</div>
+            <div class="flex-between" style="margin-top:10px;"><button class="buyIdrBtn" data-id="${doc.id}">Beli IDR</button><button class="buyCoinBtn" data-id="${doc.id}">Beli Coin</button></div></div>
+          </div>
+        `;
+      });
+      container.innerHTML = html || '<p>Belum ada produk.</p>';
+      document.querySelectorAll('.buyIdrBtn').forEach(btn => btn.addEventListener('click', e => buyProduct(btn.dataset.id, 'IDR')));
+      document.querySelectorAll('.buyCoinBtn').forEach(btn => btn.addEventListener('click', e => buyProduct(btn.dataset.id, 'COIN')));
+    });
+  }
+
+  async function buyProduct(productId, method) {
+    if(!currentUser) return alert('Login dulu!');
+    const productSnap = await db.collection('products').doc(productId).get();
+    const product = productSnap.data();
+    if(product.stock <= 0) return alert('Stok habis!');
+    const userSnap = await db.collection('users').doc(currentUser.uid).get();
+    const userData = userSnap.data();
+    if(method === 'IDR') {
+      // sistem pembayaran manual upload bukti
+      const nominal = product.priceIdr;
+      const settings = await db.collection('settings').doc('paymentSettings').get();
+      const rekening = settings.exists ? settings.data().rekeningInfo : 'Bank BCA 1234567890 a.n Doominiks';
+      const paymentId = `INV-${Date.now()}`;
+      await db.collection('orders').add({
+        userId: currentUser.uid,
+        productId, productName: product.name, amount: nominal, method: 'IDR',
+        status: 'menunggu pembayaran', paymentProof: null, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        paymentCode: paymentId, rekeningInfo: rekening
+      });
+      alert(`Pesanan dibuat! Silakan transfer Rp ${nominal} ke ${rekening}. Upload bukti di halaman Pesanan.`);
+      renderPage('orders');
+    } else { // BELI DENGAN COIN
+      if(userData.coins >= product.priceCoin) {
+        await db.collection('users').doc(currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(-product.priceCoin) });
+        await db.collection('products').doc(productId).update({ stock: firebase.firestore.FieldValue.increment(-1) });
+        await db.collection('orders').add({
+          userId: currentUser.uid, productId, productName: product.name, amountCoin: product.priceCoin, method: 'COIN',
+          status: 'selesai (coin)', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`Berhasil membeli ${product.name} dengan coin!`);
+        renderPage('shop');
+      } else alert('Coin tidak cukup!');
+    }
+  }
+
+  async function loadMyOrders() {
+    const container = document.getElementById('myOrdersList');
+    if(!container) return;
+    const snapshot = await db.collection('orders').where('userId', '==', currentUser.uid).orderBy('createdAt', 'desc').get();
+    let html = '';
+    snapshot.forEach(doc => {
+      const o = doc.data();
+      html += `<div class="panel" style="margin-bottom:1rem;"><div>🆔 ${doc.id}</div><div>Produk: ${o.productName}</div><div>Metode: ${o.method}</div><div>Status: <strong>${o.status}</strong></div>`;
+      if(o.status === 'menunggu pembayaran' && o.method === 'IDR') {
+        html += `<input type="file" id="proof-${doc.id}" accept="image/*"><button class="uploadProofBtn" data-order="${doc.id}">Upload Bukti Transfer</button>`;
+      }
+      if(o.status === 'pesanan dikirim') html += `<div>📦 Pesanan telah dikirim!</div>`;
+      html += `</div>`;
+    });
+    container.innerHTML = html || '<p>Tidak ada pesanan.</p>';
+    document.querySelectorAll('.uploadProofBtn').forEach(btn => btn.addEventListener('click', async (e) => {
+      const orderId = btn.dataset.order;
+      const fileInput = document.getElementById(`proof-${orderId}`);
+      if(fileInput.files.length === 0) return alert('Pilih bukti transfer');
+      const file = fileInput.files[0];
+      const storageRef = storage.ref(`payment_proofs/${orderId}_${Date.now()}`);
+      await storageRef.put(file);
+      const url = await storageRef.getDownloadURL();
+      await db.collection('orders').doc(orderId).update({ paymentProof: url, status: 'menunggu verifikasi' });
+      alert('Bukti terupload, menunggu konfirmasi owner.');
+      loadMyOrders();
+    }));
+  }
+
+  function showTopupModal() {
+    const nominal = prompt('Masukkan nominal topup (IDR) minimal 10000:');
+    if(!nominal || parseInt(nominal) < 10000) return;
+    db.collection('settings').doc('paymentSettings').get().then(doc => {
+      const rek = doc.exists ? doc.data().rekeningInfo : 'Bank BCA 1234567890 a.n Doominiks';
+      const topupId = `TOP-${Date.now()}`;
+      db.collection('topupRequests').add({
+        userId: currentUser.uid, nominal: parseInt(nominal), status: 'pending', rekeningInfo: rek, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert(`Permintaan topup Rp ${nominal} dibuat. Transfer ke ${rek} lalu upload bukti di menu Profil > Topup (akan ada notifikasi). Sederhana: owner akan verifikasi dan menambah coin.`);
+      });
+    });
+  }
+
+  // CHAT PRIBADI DENGAN OWNER
+  let chatUnsub = null;
+  function loadChat() {
+    if(chatUnsub) chatUnsub();
+    const chatId = `chat_${currentUser.uid}`;
+    chatUnsub = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp').onSnapshot(snap => {
+      const msgsDiv = document.getElementById('chatMessages');
+      if(!msgsDiv) return;
+      let html = '';
+      snap.forEach(msg => {
+        const data = msg.data();
+        html += `<div class="chat-message ${data.sender === 'admin' ? 'admin' : ''}"><b>${data.sender === 'admin' ? '👑 Owner' : currentUser.email}:</b> ${data.text}<div style="font-size:10px;">${data.timestamp?.toDate?.().toLocaleTimeString() || ''}</div></div>`;
+      });
+      msgsDiv.innerHTML = html;
+      msgsDiv.scrollTop = msgsDiv.scrollHeight;
+    });
+  }
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    if(!input.value.trim()) return;
+    const chatId = `chat_${currentUser.uid}`;
+    await db.collection('chats').doc(chatId).collection('messages').add({
+      text: input.value, sender: 'customer', timestamp: firebase.firestore.FieldValue.serverTimestamp(), uid: currentUser.uid
+    });
+    input.value = '';
+  }
+
+  async function loadReviewsPreview() {
+    const revDiv = document.getElementById('reviewsPreview');
+    if(!revDiv) return;
+    const snap = await db.collection('reviews').orderBy('createdAt', 'desc').limit(5).get();
+    let html = '';
+    snap.forEach(r => { const data = r.data(); html += `<div><strong>${data.username}</strong> ⭐${data.rating} : ${data.comment}</div>`; });
+    revDiv.innerHTML = html || 'Belum ada ulasan.';
+  }
+
+  // =============== PANEL OWNER (SEMUA SETTING) ===============
+  async function renderOwnerPanel() {
+    if(userRole !== 'owner') return;
+    const container = document.getElementById('pageContent');
+    container.innerHTML = `
+      <div class="panel glow-red"><h2>👑 PANEL OWNER - DOOMINIKS</h2>
+      <div class="flex-between"><button id="ownerSettingsBtn">Pengaturan Toko</button><button id="ownerProductsBtn">Kelola Produk</button><button id="ownerOrdersBtn">Log Pesanan & Transaksi</button><button id="ownerBadgeBtn">Kasih Badge ke User</button><button id="ownerReviewsBtn">Kelola Rating/Ulasan</button><button id="ownerStokBtn">Atur Stok</button><button id="ownerDiscordBtn">Atur Link Discord</button></div>
+      <div id="ownerDynamicPanel" style="margin-top: 1.5rem;"></div>
+      </div>
+    `;
+    document.getElementById('ownerSettingsBtn')?.addEventListener('click', () => showOwnerSettings());
+    document.getElementById('ownerProductsBtn')?.addEventListener('click', () => manageProducts());
+    document.getElementById('ownerOrdersBtn')?.addEventListener('click', () => showOrderLogs());
+    document.getElementById('ownerBadgeBtn')?.addEventListener('click', () => giveBadgeUI());
+    document.getElementById('ownerReviewsBtn')?.addEventListener('click', () => manageReviews());
+    document.getElementById('ownerStokBtn')?.addEventListener('click', () => manageStock());
+    document.getElementById('ownerDiscordBtn')?.addEventListener('click', () => setDiscordLink());
+    showOwnerSettings();
+  }
+  async function showOwnerSettings() { 
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const snap = await db.collection('settings').doc('paymentSettings').get();
+    const data = snap.exists ? snap.data() : {};
+    dyn.innerHTML = `<h3>Pengaturan Rekening & E-wallet</h3><textarea id="rekText" rows="3">${data.rekeningInfo || 'BCA 1234567890 a.n Doominiks'}</textarea><button id="saveRekBtn">Simpan</button>
+    <hr><h3>Ubah Username & Password Owner</h3><input id="newOwnerUsername" placeholder="Username baru"><button id="updateOwnerUsername">Update Username</button><input id="newOwnerPass" placeholder="Password baru"><button id="updateOwnerPass">Update Password</button>`;
+    document.getElementById('saveRekBtn')?.addEventListener('click', async() => {
+      await db.collection('settings').doc('paymentSettings').set({ rekeningInfo: document.getElementById('rekText').value }, { merge: true });
+      alert('Rekening disimpan');
+    });
+    document.getElementById('updateOwnerUsername')?.addEventListener('click', async() => {
+      const newName = document.getElementById('newOwnerUsername').value;
+      if(newName) await db.collection('users').doc(currentUser.uid).update({ username: newName });
+      alert('Username owner diupdate');
+    });
+    document.getElementById('updateOwnerPass')?.addEventListener('click', async() => {
+      const newPass = document.getElementById('newOwnerPass').value;
+      if(newPass) await currentUser.updatePassword(newPass);
+      alert('Password berhasil diubah');
+    });
+  }
+  async function manageProducts() {
+    const dyn = document.getElementById('ownerDynamicPanel');
+    dyn.innerHTML = `<h3>Tambah / Edit Produk</h3><input id="prodName" placeholder="Nama Produk"><input id="prodDesc" placeholder="Deskripsi"><input id="prodPriceIdr" placeholder="Harga IDR"><input id="prodPriceCoin" placeholder="Harga Coin"><input id="prodStock" placeholder="Stok"><input type="file" id="prodImage"><button id="addProductBtn">Tambah Produk</button><div id="productListOwner"></div>`;
+    const listDiv = document.getElementById('productListOwner');
+    db.collection('products').onSnapshot(snap => {
+      let html = '';
+      snap.forEach(doc => {
+        const p = doc.data();
+        html += `<div>${p.name} - Stok: ${p.stock} <button class="delProd" data-id="${doc.id}">Hapus</button></div>`;
+      });
+      if(listDiv) listDiv.innerHTML = html;
+      document.querySelectorAll('.delProd').forEach(btn => btn.addEventListener('click', async(e) => {
+        await db.collection('products').doc(btn.dataset.id).delete();
+      }));
+    });
+    document.getElementById('addProductBtn')?.addEventListener('click', async() => {
+      const name = document.getElementById('prodName').value, desc = document.getElementById('prodDesc').value, priceIdr = parseInt(document.getElementById('prodPriceIdr').value), priceCoin = parseInt(document.getElementById('prodPriceCoin').value), stock = parseInt(document.getElementById('prodStock').value);
+      let imageUrl = '';
+      const file = document.getElementById('prodImage').files[0];
+      if(file) {
+        const ref = storage.ref(`products/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        imageUrl = await ref.getDownloadURL();
+      }
+      await db.collection('products').add({ name, desc, priceIdr, priceCoin, stock, imageUrl });
+      alert('Produk ditambahkan');
+    });
+  }
+  async function showOrderLogs() {
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const ordersSnap = await db.collection('orders').orderBy('createdAt', 'desc').get();
+    let html = `<h3>Log Pesanan & History</h3>`;
+    ordersSnap.forEach(doc => {
+      const o = doc.data();
+      html += `<div class="glow-red" style="margin:10px;padding:10px;">ID: ${doc.id} | User: ${o.userId} | Produk: ${o.productName} | Status: ${o.status} | Metode: ${o.method}
+      ${o.status === 'menunggu verifikasi' ? `<button class="confirmPay" data-id="${doc.id}">Konfirmasi Pembayaran & Kirim Pesanan</button>` : ''}
+      ${o.status === 'pesanan dikirim' ? '<span>✅ Sudah dikirim</span>' : ''}
+      </div>`;
+    });
+    dyn.innerHTML = html;
+    document.querySelectorAll('.confirmPay').forEach(btn => btn.addEventListener('click', async(e) => {
+      const id = btn.dataset.id;
+      await db.collection('orders').doc(id).update({ status: 'pesanan dikirim' });
+      showOrderLogs();
+    }));
+  }
+  async function giveBadgeUI() {
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const usersSnap = await db.collection('users').get();
+    let html = `<h3>Berikan Badge (Warrior, Elite, Master, Grandmaster, Mythical)</h3><select id="userSelect">`;
+    usersSnap.forEach(u => { if(u.id !== currentUser.uid) html += `<option value="${u.id}">${u.data().username || u.id}</option>`; });
+    html += `</select><select id="badgeSelect"><option>Warrior</option><option>Elite</option><option>Master</option><option>Grandmaster</option><option>Mythical</option></select><button id="grantBadgeBtn">Berikan Badge</button>`;
+    dyn.innerHTML = html;
+    document.getElementById('grantBadgeBtn')?.addEventListener('click', async() => {
+      const uid = document.getElementById('userSelect').value;
+      const badge = document.getElementById('badgeSelect').value;
+      const userRef = db.collection('users').doc(uid);
+      const userDoc = await userRef.get();
+      const badges = userDoc.data().badges || [];
+      if(!badges.includes(badge)) {
+        await userRef.update({ badges: firebase.firestore.FieldValue.arrayUnion(badge) });
+        alert(`Badge ${badge} diberikan!`);
+      } else alert('Sudah punya badge ini');
+    });
+  }
+  async function manageReviews() { 
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const revSnap = await db.collection('reviews').get();
+    let html = `<h3>Kelola Rating & Ulasan (Hapus jika perlu)</h3>`;
+    revSnap.forEach(d => { html += `<div>⭐ ${d.data().rating} : ${d.data().comment} - oleh ${d.data().username} <button class="delRev" data-id="${d.id}">Hapus</button></div>`; });
+    dyn.innerHTML = html;
+    document.querySelectorAll('.delRev').forEach(btn => btn.addEventListener('click', async(e) => { await db.collection('reviews').doc(btn.dataset.id).delete(); manageReviews(); }));
+  }
+  async function manageStock() {
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const prodSnap = await db.collection('products').get();
+    let html = `<h3>Sesuaikan Stok Produk</h3>`;
+    prodSnap.forEach(p => { html += `<div>${p.data().name} - Stok saat ini: ${p.data().stock} <input id="stock_${p.id}" type="number" placeholder="Stok baru"><button class="updateStockBtn" data-id="${p.id}">Update</button></div>`; });
+    dyn.innerHTML = html;
+    document.querySelectorAll('.updateStockBtn').forEach(btn => btn.addEventListener('click', async(e) => {
+      const pid = btn.dataset.id;
+      const newStock = parseInt(document.getElementById(`stock_${pid}`).value);
+      if(!isNaN(newStock)) await db.collection('products').doc(pid).update({ stock: newStock });
+    }));
+  }
+  async function setDiscordLink() {
+    const dyn = document.getElementById('ownerDynamicPanel');
+    const snap = await db.collection('settings').doc('general').get();
+    const currentLink = snap.exists ? snap.data().discordLink : '';
+    dyn.innerHTML = `<h3>Link Discord Server</h3><input id="discordLink" value="${currentLink}"><button id="saveDiscordBtn">Simpan Link</button>`;
+    document.getElementById('saveDiscordBtn')?.addEventListener('click', async() => {
+      await db.collection('settings').doc('general').set({ discordLink: document.getElementById('discordLink').value }, { merge: true });
+      alert('Link Discord tersimpan');
+    });
+  }
+
+  // AUTH & INIT
+  auth.onAuthStateChanged(async (user) => {
+    showLoading(false);
+    if(user) {
+      currentUser = user;
+      const isOwner = await checkOwnerStatus(user.uid);
+      userRole = isOwner ? 'owner' : 'customer';
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      if(isOwner) document.getElementById('ownerPanelBtn').style.display = 'inline-flex';
+      else document.getElementById('ownerPanelBtn').style.display = 'none';
+      renderPage('home');
+      // tambah realtime ulasan listener preview
+      db.collection('reviews').onSnapshot(() => { if(document.querySelector('[data-page="home"]')) loadReviewsPreview(); });
+    } else {
+      document.getElementById('authSection').style.display = 'flex';
+      document.getElementById('mainApp').style.display = 'none';
+      currentUser = null;
+    }
+  });
+
+  document.getElementById('doLoginBtn')?.addEventListener('click', () => { const email=document.getElementById('loginEmail').value, pass=document.getElementById('loginPassword').value; auth.signInWithEmailAndPassword(email,pass).catch(e=>document.getElementById('authMsg').innerText=e.message); });
+  document.getElementById('doRegisterBtn')?.addEventListener('click', async() => { const email=document.getElementById('regEmail').value, pass=document.getElementById('regPassword').value, username=document.getElementById('regUsername').value; try{ const cred=await auth.createUserWithEmailAndPassword(email,pass); await db.collection('users').doc(cred.user.uid).set({ username, email, balance:0, coins:100, badges:[], role:'customer' }); }catch(e){ document.getElementById('authMsg').innerText=e.message; } });
+  document.getElementById('showLoginBtn')?.addEventListener('click',()=>{ document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; });
+  document.getElementById('showRegisterBtn')?.addEventListener('click',()=>{ document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; });
+  document.getElementById('logoutBtn')?.addEventListener('click',()=>auth.signOut());
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', (e) => { if(btn.dataset.page) renderPage(btn.dataset.page); }));
+  document.getElementById('ownerPanelBtn')?.addEventListener('click', () => { if(userRole==='owner') renderOwnerPanel(); });
+  window.showTopupModal = showTopupModal;
+</script>
+</body>
+</html>
