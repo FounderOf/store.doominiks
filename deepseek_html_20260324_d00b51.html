@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DOOMINIKS PARADISE — Official Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #03030a;
+  --card: #0b0b12;
+  --surface: #111217;
+  --border: rgba(230, 30, 30, 0.3);
+  --red: #e11;
+  --red-glow: #ff2a2a;
+  --red-dim: #7a0f0f;
+  --gold: #f5b042;
+  --text: #eef2ff;
+  --text-muted: #9ca3af;
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Syne', sans-serif;
+  --transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);overflow-x:hidden;scroll-behavior:smooth;}
+::selection{background:var(--red);color:#fff;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#0a0a0a;}::-webkit-scrollbar-thumb{background:var(--red);border-radius:4px;}
+.glass-panel{background:rgba(10,10,18,0.75);backdrop-filter:blur(12px);border:1px solid rgba(230,30,30,0.2);border-radius:24px;box-shadow:0 20px 35px -12px rgba(0,0,0,0.5);transition:var(--transition);}
+.glass-panel:hover{border-color:rgba(230,30,30,0.4);box-shadow:0 25px 40px -12px rgba(230,30,30,0.2);}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(3,3,10,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:70px;}
+.nav-logo{font-family:var(--font-display);font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 30%,var(--red) 80%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-weight:500;font-size:0.85rem;letter-spacing:0.5px;transition:color 0.2s;}
+.nav-links a:hover{color:var(--red);}
+.btn-outline{background:transparent;border:1px solid rgba(230,30,30,0.5);color:#eef;padding:6px 18px;border-radius:40px;font-size:0.75rem;font-weight:600;cursor:pointer;transition:var(--transition);}
+.btn-outline:hover{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 12px rgba(230,30,30,0.5);}
+section{padding:100px 48px 80px;}
+.section-badge{font-family:var(--font-sans);font-size:0.7rem;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:8px;}
+.section-title{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff,var(--text-muted));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:48px;}
+.hero-logo{width:min(320px,55vw);filter:drop-shadow(0 0 40px rgba(230,30,30,0.5));animation:float 5s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;}
+.product-card{background:var(--surface);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.05);transition:var(--transition);cursor:pointer;}
+.product-card:hover{transform:translateY(-6px);border-color:rgba(230,30,30,0.3);box-shadow:0 30px 40px -20px rgba(230,30,30,0.3);}
+.product-img{height:180px;background:#06060c;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.product-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
+.product-card:hover .product-img img{transform:scale(1.05);}
+.product-badge{position:absolute;top:12px;left:12px;background:var(--red);color:#fff;padding:4px 12px;border-radius:40px;font-size:0.7rem;font-weight:700;}
+.product-info{padding:18px;}
+.product-name{font-weight:800;font-size:1.2rem;margin-bottom:6px;letter-spacing:-0.3px;}
+.product-price{color:var(--red);font-weight:700;font-size:1.3rem;}
+/* MODAL STYLES */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(14px);z-index:2000;display:none;align-items:center;justify-content:center;}
+.modal-content{max-width:560px;width:90%;background:var(--surface);border-radius:32px;border:1px solid rgba(230,30,30,0.3);padding:0;overflow:hidden;box-shadow:0 30px 50px rgba(0,0,0,0.5);}
+.modal-header{padding:20px 28px 0;display:flex;justify-content:space-between;align-items:center;}
+.modal-body{padding:20px 28px 28px;}
+.step-indicator{display:flex;gap:4px;margin-bottom:24px;}
+.step{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;}
+.step.active{background:var(--red);box-shadow:0 0 8px var(--red);}
+/* Loader premium */
+.loader-screen{position:fixed;inset:0;background:#010105;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s;}
+.loader-logo{font-family:var(--font-display);font-size:4rem;font-weight:800;background:linear-gradient(135deg,#fff,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:20px;animation:pulse 1.8s infinite;}
+.loader-bar{width:280px;height:3px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin:24px 0 12px;}
+.loader-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:3px;transition:width 0.2s;}
+.loader-text{font-size:0.7rem;letter-spacing:3px;color:var(--text-muted);}
+/* Utility */
+.reveal{opacity:0;transform:translateY(20px);transition:all 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.btn{background:var(--red);border:none;padding:12px 24px;border-radius:40px;color:#fff;font-weight:700;cursor:pointer;transition:var(--transition);}
+.btn:hover{background:#ff3333;transform:scale(0.98);box-shadow:0 8px 20px rgba(230,30,30,0.4);}
+.toast{position:fixed;bottom:30px;right:30px;background:#111;border-left:4px solid var(--red);padding:12px 20px;border-radius:12px;z-index:3000;transform:translateX(120%);transition:0.3s;font-size:0.85rem;}
+.toast.show{transform:translateX(0);}
+/* Responsive */
+@media(max-width:768px){section{padding:80px 24px 60px;}nav{padding:0 20px;}.product-grid{gap:16px;}}
+</style>
+</head>
+<body>
+<div class="loader-screen" id="loaderScreen">
+  <div class="loader-logo">DOOM<span style="color:var(--red)">INIKS</span></div>
+  <div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div>
+  <div class="loader-text" id="loaderStatus">INITIALIZING...</div>
+</div>
+<nav>
+  <div class="nav-logo">DOOMINIKS</div>
+  <div class="nav-links">
+    <a href="#home">HOME</a><a href="#products">STORE</a><a href="#discord">DISCORD</a><a href="#reviews">REVIEWS</a>
+    <div id="navUserInfo" style="display:none;align-items:center;gap:12px;">
+      <span id="navUserName" style="cursor:pointer;font-weight:600;"></span>
+      <span id="navCoinDisplay" style="background:rgba(245,158,11,0.15);border-radius:40px;padding:4px 12px;font-size:0.7rem;font-weight:700;color:var(--gold);cursor:pointer;">🪙 0</span>
+      <button class="btn-outline" onclick="logout()">KELUAR</button>
+    </div>
+    <button id="navLoginBtn" class="btn-outline" onclick="openAuthModal()">MASUK / DAFTAR</button>
+    <button id="navAdminBtn" class="btn-outline" style="display:none;" onclick="openAdminPanel()">⚡ ADMIN</button>
+  </div>
+</nav>
+<section id="home"><div style="text-align:center;"><img src="dooms_logo.png" class="hero-logo" onerror="this.src='https://placehold.co/300x150?text=DOOMINIKS'"><div class="hero-tagline" style="font-size:1.2rem;letter-spacing:4px;color:var(--text-muted);margin:20px 0 10px;">OFFICIAL STORE</div><div class="hero-sub" style="margin-bottom:30px;">PREMIUM GAMING GEAR & EXCLUSIVE MERCH</div><div class="hero-cta"><a href="#products" class="btn">EXPLORE NOW</a></div></div></section>
+<section id="products"><div class="section-badge">— COLLECTION</div><div class="section-title">PRODUK KAMI</div><div class="product-grid" id="productsGrid"></div></section>
+<section id="discord"><div class="glass-panel" style="max-width:600px;margin:0 auto;text-align:center;padding:48px 32px;"><div style="font-size:3rem;">🎮</div><h2 style="font-size:2rem;margin:12px 0;">GABUNG DISCORD</h2><p style="color:var(--text-muted);margin-bottom:24px;">Komunitas eksklusif, promo, dan support 24/7</p><a href="#" id="discordLink" class="btn" style="background:#5865F2;display:inline-flex;gap:10px;">JOIN NOW →</a></div></section>
+<section id="reviews"><div class="section-badge">— TESTIMONIALS</div><div class="section-title">ULASAN PEMBELI</div><div class="reviews-grid" id="reviewsGrid"></div><div class="glass-panel" style="margin-top:48px;padding:28px;"><h3>TULIS ULASAN</h3><div id="reviewLoginNotice" style="display:none;margin-bottom:16px;">⚠️ <a href="#" onclick="openAuthModal()">Login dulu</a> untuk memberi ulasan</div><div id="reviewForm"><div class="star-select" id="starSelect"></div><input type="text" id="reviewProduct" placeholder="Produk yang dibeli" class="form-input"><textarea id="reviewText" placeholder="Cerita pengalamanmu..." class="form-input" rows="3"></textarea><button class="btn" onclick="submitReview()">KIRIM ULASAN</button></div></div></section>
+<footer style="text-align:center;padding:40px;border-top:1px solid rgba(230,30,30,0.2);color:var(--text-muted);">© 2025 DOOMINIKS PARADISE. ALL RIGHTS RESERVED.</footer>
+
+<!-- MODALS -->
+<div id="authModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2>AKUN</h2><button onclick="closeAuthModal()" style="background:none;border:none;color:#fff;font-size:1.5rem;">✕</button></div><div class="modal-body"><div style="display:flex;gap:12px;margin-bottom:24px;"><button id="authLoginTab" class="btn-outline" style="flex:1;" onclick="switchAuthTab('login')">MASUK</button><button id="authRegTab" class="btn-outline" style="flex:1;" onclick="switchAuthTab('register')">DAFTAR</button></div><div id="loginPanel"><input type="text" id="loginUsername" placeholder="Username" class="form-input"><input type="password" id="loginPassword" placeholder="Password" class="form-input"><button class="btn" style="width:100%;margin-top:8px;" onclick="doLogin()">MASUK</button></div><div id="registerPanel" style="display:none;"><input type="text" id="regUsername" placeholder="Username" class="form-input"><input type="password" id="regPassword" placeholder="Password" class="form-input"><input type="password" id="regPassword2" placeholder="Ulangi Password" class="form-input"><button class="btn" style="width:100%;margin-top:8px;" onclick="doRegister()">DAFTAR</button></div></div></div></div>
+
+<div id="buyModal" class="modal-overlay"><div class="modal-content" style="max-width:560px;"><div class="modal-header"><h2 id="buyProductName"></h2><button onclick="closeBuyModal()">✕</button></div><div class="modal-body"><div style="display:flex;gap:12px;margin-bottom:20px;"><button id="buyCoinTab" class="btn-outline" style="flex:1;" onclick="setBuyMode('coin')">🪙 BAYAR COIN</button><button id="buyIdrTab" class="btn-outline" style="flex:1;" onclick="setBuyMode('idr')">💳 BAYAR IDR</button></div><div id="buyCoinPanel"><div>Koin kamu: <strong id="userCoinBalance">0</strong></div><div id="coinPriceInfo"></div><input type="text" id="orderNameCoin" placeholder="Nama" class="form-input"><input type="text" id="orderContactCoin" placeholder="Kontak (WA/Discord)" class="form-input"><textarea id="orderNoteCoin" placeholder="Catatan (opsional)" class="form-input" rows="2"></textarea><button class="btn" style="width:100%;margin-top:12px;" onclick="placeCoinOrder()">BELI SEKARANG</button><div id="coinInsufficient" style="display:none;color:var(--gold);">Koin tidak cukup. <a href="#" onclick="openCoinTopup()">Top up</a> dulu.</div></div><div id="buyIdrPanel" style="display:none;"><div class="step-indicator"><div class="step" id="idrStep1"></div><div class="step" id="idrStep2"></div><div class="step" id="idrStep3"></div></div><div id="idrStep1Panel"><div class="pm-grid" id="paymentMethodGrid"></div><button class="btn" style="width:100%;margin-top:16px;" onclick="goToIdrStep2()">LANJUT →</button></div><div id="idrStep2Panel" style="display:none;"><div id="paymentInstruction"></div><button class="btn" style="width:100%;margin-top:16px;" onclick="goToIdrStep3()">LANJUT → UPLOAD BUKTI</button></div><div id="idrStep3Panel" style="display:none;"><div class="upload-area" onclick="document.getElementById('proofInput').click()" style="border:2px dashed rgba(230,30,30,0.3);border-radius:20px;padding:24px;text-align:center;cursor:pointer;"><span>📸</span><div>Klik untuk upload bukti transfer</div><img id="proofPreview" style="max-width:100%;max-height:200px;margin-top:10px;display:none;"></div><input type="file" id="proofInput" accept="image/*" style="display:none;"><input type="text" id="orderNameIdr" placeholder="Nama" class="form-input" style="margin-top:12px;"><input type="text" id="orderContactIdr" placeholder="Kontak" class="form-input"><textarea id="orderNoteIdr" placeholder="Catatan" class="form-input" rows="2"></textarea><button class="btn" style="width:100%;margin-top:12px;" onclick="submitIdrOrder()">KIRIM ORDER</button></div></div></div></div></div>
+
+<div id="profileModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2>PROFIL</h2><button onclick="closeProfile()">✕</button></div><div class="modal-body"><div id="profileBadge"></div><div><strong id="profileUsername"></strong></div><div id="profileBio" style="margin:12px 0;color:var(--text-muted);cursor:pointer;" onclick="editBio()">✏️ Tambah bio</div><div id="profileCoin">🪙 <span id="profileCoinVal">0</span></div><div id="profileIdr">💵 Total Topup: Rp <span id="profileIdrVal">0</span></div><div class="profile-stats" style="display:flex;gap:16px;margin:16px 0;"><div><span id="orderCount">0</span> pesanan</div><div><span id="reviewCount">0</span> ulasan</div></div><div><h4>PESANANKU</h4><div id="userOrdersList" style="max-height:300px;overflow-y:auto;"></div></div></div></div></div>
+
+<div id="adminPanel" class="modal-overlay"><div class="modal-content" style="max-width:1000px;width:90%;"><div class="modal-header"><h2>OWNER PANEL</h2><button onclick="closeAdminPanel()">✕</button></div><div class="modal-body"><div id="adminLoginForm"><input type="password" id="adminPassword" placeholder="Password Owner" class="form-input"><button class="btn" onclick="adminLogin()">MASUK</button></div><div id="adminContent" style="display:none;"><div class="admin-tabs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;"><button class="btn-outline" onclick="showAdminTab('orders')">ORDER</button><button class="btn-outline" onclick="showAdminTab('settings')">SETTING</button><button class="btn-outline" onclick="showAdminTab('products')">PRODUK</button><button class="btn-outline" onclick="showAdminTab('topup')">TOPUP</button><button class="btn-outline" onclick="showAdminTab('users')">USERS</button><button class="btn-outline" onclick="showAdminTab('badges')">BADGE</button><button class="btn-outline" onclick="showAdminTab('coins')">KOIN</button></div><div id="adminOrdersTab"><div id="ordersList"></div></div><div id="adminSettingsTab" style="display:none;"><input type="text" id="ownerUsername" placeholder="Username Owner" class="form-input"><input type="password" id="ownerNewPass" placeholder="Password Baru (kosong jika tidak diubah)" class="form-input"><input type="password" id="ownerNewPass2" placeholder="Ulangi" class="form-input"><button class="btn" onclick="saveOwnerSettings()">SIMPAN AKUN</button><hr><h4>Pengumuman & Webhook</h4><input type="text" id="discordLinkSetting" placeholder="Link Discord" class="form-input"><input type="text" id="discordWebhook" placeholder="Webhook URL" class="form-input"><button class="btn" onclick="saveSiteSettings()">SIMPAN SITUS</button></div><div id="adminProductsTab" style="display:none;"><div><input type="text" id="prodName" placeholder="Nama produk" class="form-input"><input type="text" id="prodPrice" placeholder="Harga Rp" class="form-input"><input type="number" id="prodCoinPrice" placeholder="Harga Coin (opsional)" class="form-input"><div class="upload-area" onclick="document.getElementById('prodImgInput').click()" style="border:1px dashed #444;padding:12px;border-radius:12px;margin:8px 0;"><span>🖼️ Upload Gambar</span><input type="file" id="prodImgInput" accept="image/*" style="display:none;"></div><textarea id="prodDesc" placeholder="Deskripsi" class="form-input" rows="3"></textarea><button class="btn" onclick="addProduct()">TAMBAH PRODUK</button></div><div id="productListAdmin"></div></div><div id="adminTopupTab" style="display:none;"><div id="topupRequestsList"></div></div><div id="adminUsersTab" style="display:none;"><div id="usersListAdmin"></div></div><div id="adminBadgesTab" style="display:none;"><input type="text" id="badgeUser" placeholder="Username" class="form-input"><select id="badgeType" class="form-input"><option value="owner">👑 OWNER</option><option value="admin">⚡ ADMIN</option><option value="vip">⭐ VIP</option><option value="none">HAPUS</option></select><button class="btn" onclick="assignBadge()">SET BADGE</button><div id="badgeListAdmin"></div></div><div id="adminCoinsTab" style="display:none;"><input type="text" id="coinUser" placeholder="Username" class="form-input"><input type="number" id="coinAmount" placeholder="Jumlah koin" class="form-input"><button class="btn" onclick="adminGiveCoin()">TAMBAH KOIN</button><div id="coinHistoryList"></div></div></div></div></div></div>
+
+<div class="toast" id="toastMsg"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDoc, getDocs, setDoc, query, orderBy, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuZLwwomxlNUjcPp4JYILdSz4EAWtoRxY",
+  authDomain: "dooniniks-paradise.firebaseapp.com",
+  projectId: "dooniniks-paradise",
+  storageBucket: "dooniniks-paradise.firebasestorage.app",
+  messagingSenderId: "140802324914",
+  appId: "1:140802324914:web:f2e4f4f4656b75b240ccab"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Global state
+let currentUser = null;
+let products = [], orders = [], reviews = [], badgeMap = {};
+let selectedProduct = null;
+let buyMode = 'coin';
+let selectedPaymentMethod = null;
+let proofBase64 = null;
+let selectedIdrStep = 1;
+
+// Helper: toast
+function toast(msg) {
+  const t = document.getElementById('toastMsg');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Load settings
+let settings = { discordUrl: '', webhookUrl: '', adminPass: '', ownerUsername: 'Doominiks' };
+async function loadSettings() {
+  const snap = await getDoc(doc(db, 'config', 'settings'));
+  if (snap.exists()) settings = { ...settings, ...snap.data() };
+  document.getElementById('discordLink').href = settings.discordUrl || '#';
+  document.getElementById('ownerUsername').value = settings.ownerUsername || '';
+}
+loadSettings();
+
+// Listeners
+onSnapshot(collection(db, 'products'), snap => { products = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderProducts(); renderProductListAdmin(); });
+onSnapshot(collection(db, 'orders'), snap => { orders = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderOrdersAdmin(); if (currentUser) renderUserOrders(); });
+onSnapshot(collection(db, 'reviews'), snap => { reviews = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderReviews(); });
+onSnapshot(collection(db, 'badges'), snap => { badgeMap = {}; snap.docs.forEach(d => badgeMap[d.id.toLowerCase()] = d.data().type); renderReviews(); if(currentUser) updateNav(); });
+onSnapshot(collection(db, 'users'), snap => { /* update user list */ });
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" onclick="openBuyModal('${p.id}')">
+      <div class="product-img">${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<span style="font-size:3rem;">🎮</span>`}${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}</div>
+      <div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">${p.price}</div><div style="font-size:0.75rem;">${p.coinPrice ? `🪙 ${p.coinPrice} coin` : ''}</div></div>
+    </div>`).join('');
+}
+function renderReviews() {
+  const grid = document.getElementById('reviewsGrid');
+  grid.innerHTML = reviews.slice(0,6).map(r => `<div class="glass-panel" style="padding:16px;"><div><strong>${r.name} ${badgeMap[r.name?.toLowerCase()] ? `<span class="badge">⭐</span>` : ''}</strong> • ${'★'.repeat(r.stars)}</div><p>${r.text}</p></div>`).join('');
+}
+// Auth
+window.openAuthModal = () => document.getElementById('authModal').style.display = 'flex';
+window.closeAuthModal = () => document.getElementById('authModal').style.display = 'none';
+window.switchAuthTab = (tab) => {
+  document.getElementById('loginPanel').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerPanel').style.display = tab === 'register' ? 'block' : 'none';
+};
+async function doLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const snap = await getDoc(doc(db, 'usernames', username.toLowerCase()));
+  if (!snap.exists()) return toast('Username tidak ditemukan');
+  const data = snap.data();
+  if (data.passHash !== hash(pass)) return toast('Password salah');
+  currentUser = { username, chatId: data.chatId, coins: data.coins || 0 };
+  localStorage.setItem('doom_user', JSON.stringify(currentUser));
+  updateNav();
+  closeAuthModal();
+  toast(`Halo ${username}!`);
+}
+async function doRegister() {
+  const username = document.getElementById('regUsername').value.trim();
+  const pass = document.getElementById('regPassword').value;
+  const pass2 = document.getElementById('regPassword2').value;
+  if (pass !== pass2) return toast('Password tidak cocok');
+  if (username.length < 3) return toast('Min 3 karakter');
+  const exist = await getDoc(doc(db, 'usernames', username.toLowerCase()));
+  if (exist.exists()) return toast('Username sudah dipakai');
+  const chatRef = await addDoc(collection(db, 'chats'), { customerName: username, lastMsg: '', lastTime: new Date(), unreadAdmin: 0 });
+  await setDoc(doc(db, 'usernames', username.toLowerCase()), { username, passHash: hash(pass), chatId: chatRef.id });
+  await setDoc(doc(db, 'users', username.toLowerCase()), { username, coins: 0, chatId: chatRef.id, bio: '' });
+  toast('Akun terbuat! Silakan login');
+  switchAuthTab('login');
+}
+function hash(str) { let h=0; for(let i=0;i<str.length;i++) h=(h<<5)-h+str.charCodeAt(i)|0; return h.toString(36); }
+function updateNav() {
+  if(currentUser) {
+    document.getElementById('navUserInfo').style.display = 'flex';
+    document.getElementById('navUserName').innerHTML = currentUser.username + (badgeMap[currentUser.username.toLowerCase()] ? ` <span class="badge">👑</span>` : '');
+    document.getElementById('navCoinDisplay').innerHTML = `🪙 ${currentUser.coins || 0}`;
+    document.getElementById('navLoginBtn').style.display = 'none';
+    document.getElementById('navAdminBtn').style.display = settings.adminPass ? 'block' : 'none';
+  } else {
+    document.getElementById('navUserInfo').style.display = 'none';
+    document.getElementById('navLoginBtn').style.display = 'block';
+    document.getElementById('navAdminBtn').style.display = 'none';
+  }
+}
+window.logout = () => { currentUser = null; localStorage.removeItem('doom_user'); updateNav(); toast('Keluar'); };
+
+// Buy modal
+window.openBuyModal = async (productId) => {
+  const prod = products.find(p => p.id === productId);
+  if (!prod) return;
+  selectedProduct = prod;
+  document.getElementById('buyProductName').innerText = prod.name;
+  document.getElementById('buyCoinPanel').style.display = 'block';
+  document.getElementById('buyIdrPanel').style.display = 'none';
+  buyMode = 'coin';
+  document.getElementById('buyCoinTab').classList.add('active');
+  document.getElementById('buyIdrTab').classList.remove('active');
+  if (currentUser) {
+    document.getElementById('userCoinBalance').innerText = currentUser.coins || 0;
+    document.getElementById('orderNameCoin').value = currentUser.username;
+  }
+  const coinPrice = prod.coinPrice || 0;
+  document.getElementById('coinPriceInfo').innerHTML = `<strong>🪙 ${coinPrice} coin</strong>`;
+  document.getElementById('coinInsufficient').style.display = (currentUser?.coins >= coinPrice) ? 'none' : 'block';
+  document.getElementById('buyModal').style.display = 'flex';
+};
+window.closeBuyModal = () => document.getElementById('buyModal').style.display = 'none';
+window.setBuyMode = (mode) => {
+  buyMode = mode;
+  document.getElementById('buyCoinPanel').style.display = mode === 'coin' ? 'block' : 'none';
+  document.getElementById('buyIdrPanel').style.display = mode === 'idr' ? 'block' : 'none';
+  if (mode === 'idr') {
+    selectedIdrStep = 1;
+    updateIdrSteps();
+    renderPaymentMethods();
+  }
+};
+function updateIdrSteps() {
+  document.querySelectorAll('#idrStep1Panel, #idrStep2Panel, #idrStep3Panel').forEach((el, i) => el.style.display = (i+1 === selectedIdrStep) ? 'block' : 'none');
+  document.getElementById('idrStep1').classList.toggle('active', selectedIdrStep >= 1);
+  document.getElementById('idrStep2').classList.toggle('active', selectedIdrStep >= 2);
+  document.getElementById('idrStep3').classList.toggle('active', selectedIdrStep >= 3);
+}
+window.goToIdrStep2 = () => { if(selectedPaymentMethod) { selectedIdrStep = 2; updateIdrSteps(); renderPaymentInstruction(); } else toast('Pilih metode dulu'); };
+window.goToIdrStep3 = () => { selectedIdrStep = 3; updateIdrSteps(); };
+function renderPaymentMethods() {
+  const grid = document.getElementById('paymentMethodGrid');
+  const methods = [];
+  if(settings.pay_dana) methods.push({id:'dana',name:'DANA',no:settings.pay_dana});
+  if(settings.pay_gopay) methods.push({id:'gopay',name:'GOPAY',no:settings.pay_gopay});
+  if(settings.pay_ovo) methods.push({id:'ovo',name:'OVO',no:settings.pay_ovo});
+  if(settings.pay_seabank) methods.push({id:'seabank',name:'SEABANK',no:settings.pay_seabank});
+  grid.innerHTML = methods.map(m => `<div class="pm-card" onclick="selectPaymentMethod('${m.id}')"><strong>${m.name}</strong><div>${m.no}</div></div>`).join('');
+}
+window.selectPaymentMethod = (id) => {
+  selectedPaymentMethod = id;
+  document.querySelectorAll('.pm-card').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+};
+function renderPaymentInstruction() {
+  const method = selectedPaymentMethod;
+  const unique = Math.floor(Math.random() * 900) + 100;
+  const amount = selectedProduct.price.replace(/[^0-9]/g,'');
+  const total = parseInt(amount) + unique;
+  const totalFormatted = `Rp ${total.toLocaleString('id-ID')}`;
+  const no = settings[`pay_${method}`];
+  document.getElementById('paymentInstruction').innerHTML = `<div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:20px;"><p>Transfer ke <strong>${method.toUpperCase()}</strong></p><p style="font-size:1.5rem;">${no}</p><p>Nominal: <strong>${totalFormatted}</strong> (termasuk kode unik ${unique})</p><button class="btn-outline" onclick="navigator.clipboard.writeText('${no}')">SALIN NO</button><button class="btn-outline" onclick="navigator.clipboard.writeText('${totalFormatted}')">SALIN NOMINAL</button></div>`;
+}
+document.getElementById('proofInput').onchange = (e) => {
+  const file = e.target.files[0];
+  if(file && file.size < 5*1024*1024) {
+    const reader = new FileReader();
+    reader.onload = ev => { proofBase64 = ev.target.result; document.getElementById('proofPreview').src = proofBase64; document.getElementById('proofPreview').style.display = 'block'; };
+    reader.readAsDataURL(file);
+  } else toast('File terlalu besar (max 5MB)');
+};
+window.submitIdrOrder = async () => {
+  if(!proofBase64) return toast('Upload bukti transfer dulu');
+  const name = document.getElementById('orderNameIdr').value.trim() || currentUser?.username || 'Guest';
+  const contact = document.getElementById('orderContactIdr').value.trim();
+  const note = document.getElementById('orderNoteIdr').value;
+  if(!contact) return toast('Kontak wajib diisi');
+  const order = {
+    product: selectedProduct.name,
+    name, contact, note,
+    status: 'pending',
+    payMethod: selectedPaymentMethod,
+    proofImage: proofBase64,
+    date: new Date().toISOString(),
+    createdAt: new Date()
+  };
+  await addDoc(collection(db, 'orders'), order);
+  // kurangi stok
+  if(selectedProduct.stock > 0) await updateDoc(doc(db, 'products', selectedProduct.id), { stock: selectedProduct.stock - 1 });
+  toast('Order dikirim! Menunggu konfirmasi admin');
+  closeBuyModal();
+  // kirim notif discord
+  if(settings.webhookUrl) fetch(settings.webhookUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ content: `🛒 ORDER BARU (IDR) dari ${name}\nProduk: ${selectedProduct.name}\nBukti: terlampir` }) });
+};
+window.placeCoinOrder = async () => {
+  if(!currentUser) return openAuthModal();
+  const coinPrice = selectedProduct.coinPrice || 0;
+  if((currentUser.coins||0) < coinPrice) return toast('Koin tidak cukup');
+  const name = document.getElementById('orderNameCoin').value.trim();
+  const contact = document.getElementById('orderContactCoin').value.trim();
+  if(!name || !contact) return toast('Isi nama dan kontak');
+  await addDoc(collection(db, 'orders'), { product: selectedProduct.name, name, contact, note: document.getElementById('orderNoteCoin').value, status: 'new', payMethod: 'coin', coinAmount: coinPrice, createdAt: new Date() });
+  await updateDoc(doc(db, 'users', currentUser.username.toLowerCase()), { coins: (currentUser.coins - coinPrice) });
+  currentUser.coins -= coinPrice;
+  updateNav();
+  toast('Pembelian berhasil!');
+  closeBuyModal();
+};
+// Admin
+window.openAdminPanel = () => document.getElementById('adminPanel').style.display = 'flex';
+window.closeAdminPanel = () => document.getElementById('adminPanel').style.display = 'none';
+window.adminLogin = async () => {
+  const pass = document.getElementById('adminPassword').value;
+  if(pass === settings.adminPass) {
+    document.getElementById('adminLoginForm').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    showAdminTab('orders');
+  } else toast('Password salah');
+};
+window.showAdminTab = (tab) => {
+  ['orders','settings','products','topup','users','badges','coins'].forEach(t => document.getElementById(`admin${t.charAt(0).toUpperCase()+t.slice(1)}Tab`).style.display = t===tab ? 'block' : 'none');
+  if(tab === 'orders') renderOrdersAdmin();
+  if(tab === 'topup') renderTopupRequests();
+  if(tab === 'users') renderUsersAdmin();
+  if(tab === 'badges') renderBadgeListAdmin();
+  if(tab === 'coins') renderCoinHistory();
+};
+function renderOrdersAdmin() {
+  const container = document.getElementById('ordersList');
+  container.innerHTML = orders.map(o => `<div class="glass-panel" style="margin-bottom:12px;padding:16px;"><div><strong>${o.product}</strong> — ${o.name} (${o.contact})</div><div>Status: <span style="color:${o.status==='pending'?'var(--gold)':o.status==='done'?'#0c0':'#e11'}">${o.status}</span></div>${o.proofImage ? `<div><img src="${o.proofImage}" style="max-height:100px;border-radius:12px;"></div>` : ''}<div><button class="btn-outline" onclick="updateOrderStatus('${o.id}','done')">✔ Selesai</button><button class="btn-outline" onclick="updateOrderStatus('${o.id}','pending')">⏳ Proses</button></div></div>`).join('');
+}
+window.updateOrderStatus = async (id, status) => { await updateDoc(doc(db,'orders',id), { status }); toast('Status diperbarui'); };
+async function renderTopupRequests() {
+  const snap = await getDocs(query(collection(db,'topupRequests'), orderBy('createdAt','desc')));
+  const list = document.getElementById('topupRequestsList');
+  list.innerHTML = snap.docs.map(d => { const r = d.data(); return `<div class="glass-panel" style="margin-bottom:8px;padding:12px;"><div><strong>${r.username}</strong> - ${r.pkgName} (${r.method})</div><img src="${r.proofImage}" style="max-height:80px;"><div><button class="btn-outline" onclick="approveTopup('${d.id}',${r.pkgCoins})">APPROVE</button><button class="btn-outline" onclick="rejectTopup('${d.id}')">TOLAK</button></div></div>`; }).join('');
+}
+window.approveTopup = async (id, coins) => {
+  const reqSnap = await getDoc(doc(db,'topupRequests',id));
+  const username = reqSnap.data().username;
+  await updateDoc(doc(db,'topupRequests',id), { status:'approved' });
+  const userSnap = await getDoc(doc(db,'users',username.toLowerCase()));
+  const cur = userSnap.exists() ? (userSnap.data().coins||0) : 0;
+  await updateDoc(doc(db,'users',username.toLowerCase()), { coins: cur + coins });
+  toast(`+${coins} coin untuk ${username}`);
+  renderTopupRequests();
+};
+window.rejectTopup = async (id) => { await updateDoc(doc(db,'topupRequests',id), { status:'rejected' }); renderTopupRequests(); };
+function renderUsersAdmin() {
+  // fetch users
+  getDocs(collection(db,'users')).then(snap => {
+    const list = document.getElementById('usersListAdmin');
+    list.innerHTML = snap.docs.map(d => `<div>${d.id} - 🪙 ${d.data().coins||0}</div>`).join('');
+  });
+}
+function renderBadgeListAdmin() {
+  getDocs(collection(db,'badges')).then(snap => {
+    const list = document.getElementById('badgeListAdmin');
+    list.innerHTML = snap.docs.map(d => `<div>${d.id} : ${d.data().type} <button class="btn-outline" onclick="deleteBadge('${d.id}')">Hapus</button></div>`).join('');
+  });
+}
+window.assignBadge = async () => {
+  const user = document.getElementById('badgeUser').value.trim().toLowerCase();
+  const type = document.getElementById('badgeType').value;
+  if(type === 'none') await deleteDoc(doc(db,'badges',user));
+  else await setDoc(doc(db,'badges',user), { type, username: user });
+  toast('Badge diperbarui');
+  renderBadgeListAdmin();
+};
+window.deleteBadge = async (user) => { await deleteDoc(doc(db,'badges',user)); renderBadgeListAdmin(); };
+window.adminGiveCoin = async () => {
+  const user = document.getElementById('coinUser').value.trim().toLowerCase();
+  const amount = parseInt(document.getElementById('coinAmount').value);
+  if(!user || isNaN(amount)) return toast('Isi data');
+  const userSnap = await getDoc(doc(db,'users',user));
+  const cur = userSnap.exists() ? userSnap.data().coins||0 : 0;
+  await updateDoc(doc(db,'users',user), { coins: cur + amount });
+  await addDoc(collection(db,'coinHistory'), { username: user, amount, type: 'admin', date: new Date() });
+  toast(`+${amount} coin untuk ${user}`);
+  renderCoinHistory();
+};
+async function renderCoinHistory() {
+  const snap = await getDocs(query(collection(db,'coinHistory'), orderBy('date','desc'), limit(20)));
+  const list = document.getElementById('coinHistoryList');
+  list.innerHTML = snap.docs.map(d => `<div>${d.data().username} ${d.data().amount>0?'+':''}${d.data().amount} · ${d.data().date?.toDate?.().toLocaleString()}</div>`).join('');
+}
+// Product add
+window.addProduct = async () => {
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  const coinPrice = parseInt(document.getElementById('prodCoinPrice').value) || null;
+  const imgFile = document.getElementById('prodImgInput').files[0];
+  let imgBase64 = '';
+  if(imgFile) {
+    const reader = new FileReader();
+    await new Promise(resolve => { reader.onload = e => { imgBase64 = e.target.result; resolve(); }; reader.readAsDataURL(imgFile); });
+  }
+  const desc = document.getElementById('prodDesc').value;
+  if(!name || !price) return toast('Nama dan harga wajib');
+  await addDoc(collection(db,'products'), { name, price, coinPrice, img: imgBase64, desc, stock: -1, sold: 0, createdAt: new Date() });
+  toast('Produk ditambahkan');
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodCoinPrice').value = '';
+  document.getElementById('prodDesc').value = '';
+  document.getElementById('prodImgInput').value = '';
+};
+function renderProductListAdmin() {
+  const container = document.getElementById('productListAdmin');
+  container.innerHTML = products.map(p => `<div class="glass-panel" style="margin:8px;padding:12px;"><div><strong>${p.name}</strong> - ${p.price} ${p.coinPrice?`🪙 ${p.coinPrice}`:''}</div><div><button class="btn-outline" onclick="deleteProduct('${p.id}')">Hapus</button></div></div>`).join('');
+}
+window.deleteProduct = async (id) => { await deleteDoc(doc(db,'products',id)); toast('Produk dihapus'); };
+// Owner settings
+window.saveOwnerSettings = async () => {
+  const newUser = document.getElementById('ownerUsername').value.trim();
+  const newPass = document.getElementById('ownerNewPass').value;
+  const newPass2 = document.getElementById('ownerNewPass2').value;
+  if(newPass && newPass !== newPass2) return toast('Password tidak cocok');
+  const update = {};
+  if(newUser) update.ownerUsername = newUser;
+  if(newPass) update.adminPass = newPass;
+  await setDoc(doc(db,'config','settings'), update, { merge: true });
+  if(newPass) settings.adminPass = newPass;
+  if(newUser) settings.ownerUsername = newUser;
+  toast('Akun owner disimpan');
+};
+window.saveSiteSettings = async () => {
+  const discordUrl = document.getElementById('discordLinkSetting').value;
+  const webhook = document.getElementById('discordWebhook').value;
+  await setDoc(doc(db,'config','settings'), { discordUrl, webhookUrl: webhook }, { merge: true });
+  settings.discordUrl = discordUrl;
+  settings.webhookUrl = webhook;
+  document.getElementById('discordLink').href = discordUrl;
+  toast('Pengaturan situs disimpan');
+};
+// Profile & user orders
+function renderUserOrders() {
+  const myOrders = orders.filter(o => o.name === currentUser?.username || o.contact === currentUser?.username);
+  const container = document.getElementById('userOrdersList');
+  container.innerHTML = myOrders.map(o => `<div class="glass-panel" style="margin-bottom:8px;padding:12px;"><div>${o.product} - ${o.status}</div>${o.proofImage ? `<img src="${o.proofImage}" style="max-height:60px;">` : ''}</div>`).join('');
+  document.getElementById('orderCount').innerText = myOrders.length;
+}
+window.openProfile = async () => {
+  if(!currentUser) return;
+  const snap = await getDoc(doc(db,'users',currentUser.username.toLowerCase()));
+  const data = snap.data();
+  document.getElementById('profileUsername').innerText = currentUser.username;
+  document.getElementById('profileBio').innerHTML = data?.bio ? `📝 ${data.bio}` : '✏️ Tambah bio';
+  document.getElementById('profileCoinVal').innerText = currentUser.coins || 0;
+  document.getElementById('profileIdrVal').innerText = data?.idrBalance || 0;
+  renderUserOrders();
+  document.getElementById('profileModal').style.display = 'flex';
+};
+window.closeProfile = () => document.getElementById('profileModal').style.display = 'none';
+window.editBio = () => {
+  const newBio = prompt('Bio baru:', currentUser.bio || '');
+  if(newBio !== null) updateDoc(doc(db,'users',currentUser.username.toLowerCase()), { bio: newBio }).then(() => { currentUser.bio = newBio; openProfile(); });
+};
+// Loader animation
+let pct = 0;
+const loaderInterval = setInterval(() => {
+  if(pct < 100) {
+    pct += Math.random() * 6 + 1;
+    if(pct > 100) pct = 100;
+    document.getElementById('loaderFill').style.width = pct + '%';
+    document.getElementById('loaderStatus').innerText = pct < 30 ? 'LOADING ASSETS...' : pct < 70 ? 'CONNECTING...' : 'WELCOME TO PARADISE';
+  } else {
+    clearInterval(loaderInterval);
+    document.getElementById('loaderScreen').style.opacity = '0';
+    setTimeout(() => document.getElementById('loaderScreen').style.display = 'none', 800);
+  }
+}, 70);
+// Auto login from localStorage
+const savedUser = localStorage.getItem('doom_user');
+if(savedUser) {
+  try {
+    currentUser = JSON.parse(savedUser);
+    updateNav();
+    // fetch coins
+    getDoc(doc(db,'users',currentUser.username.toLowerCase())).then(snap => { if(snap.exists()) { currentUser.coins = snap.data().coins || 0; updateNav(); } });
+  } catch(e) {}
+}
+// Check admin mode from URL
+if(window.location.search.includes('admin=true')) document.getElementById('navAdminBtn').style.display = 'block';
+window.openCoinTopup = () => toast('Fitur topup koin ada di profil (belum diintegrasi)');
+</script>
+</body>
+</html>
