@@ -895,47 +895,46 @@ const DEF_OWNER_PW = 'doominiks123';
 // ================================================================
 // FIREBASE HELPERS
 // ================================================================
-function FS()  { return window.FS; }
-function RDB() { return window.RDB; }
-function FO()  { return window.FO; }
+function getFS()  { return window.FS; }
+function getRDB() { return window.RDB; }
+function getFO()  { return window.FO; }
 
 async function dbSet(col, id, data) {
-  await FO().setDoc(FO().doc(FS(), col, id), data, { merge: true });
+  await getFO().setDoc(getFO().doc(getFS(), col, id), data, { merge: true });
 }
 async function dbGet(col, id) {
-  const s = await FO().getDoc(FO().doc(FS(), col, id));
+  const s = await getFO().getDoc(getFO().doc(getFS(), col, id));
   return s.exists() ? { id: s.id, ...s.data() } : null;
 }
 async function dbGetAll(col) {
-  const s = await FO().getDocs(FO().collection(FS(), col));
+  const s = await getFO().getDocs(getFO().collection(getFS(), col));
   return s.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 async function dbAdd(col, data) {
   data.createdAt = Date.now();
-  const r = await FO().addDoc(FO().collection(FS(), col), data);
+  const r = await getFO().addDoc(getFO().collection(getFS(), col), data);
   return r.id;
 }
 async function dbUpd(col, id, data) {
-  await FO().updateDoc(FO().doc(FS(), col, id), data);
+  await getFO().updateDoc(getFO().doc(getFS(), col, id), data);
 }
 async function dbDel(col, id) {
-  await FO().deleteDoc(FO().doc(FS(), col, id));
+  await getFO().deleteDoc(getFO().doc(getFS(), col, id));
 }
 async function rtSet(path, val) {
-  await FO().set(FO().ref(RDB(), path), val);
+  await getFO().set(getFO().ref(getRDB(), path), val);
 }
 async function rtGet(path) {
-  const s = await FO().get(FO().ref(RDB(), path));
+  const s = await getFO().get(getFO().ref(getRDB(), path));
   return s.exists() ? s.val() : null;
 }
 function rtListen(path, cb) {
-  return FO().onValue(FO().ref(RDB(), path), s => cb(s.exists() ? s.val() : null));
+  return getFO().onValue(getFO().ref(getRDB(), path), s => cb(s.exists() ? s.val() : null));
 }
 async function rtPush(path, data) {
   data.ts = Date.now();
-  await FO().push(FO().ref(RDB(), path), data);
+  await getFO().push(getFO().ref(getRDB(), path), data);
 }
-
 // ================================================================
 // LOADING
 // ================================================================
