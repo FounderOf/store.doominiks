@@ -12,15 +12,16 @@
   import { getDatabase, ref, set, get, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   /* ====== GANTI DENGAN FIREBASE CONFIG ANDA ====== */
-  const firebaseConfig = {
-    apiKey: "AIzaSyDECWw2-w_HdtmIFp5eJB1es_h8lpT0Gt4",
-    authDomain: "doominiks-niks.firebaseapp.com",
-    databaseURL: "https://doominiks-niks-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "doominiks-niks",
-    storageBucket: "doominiks-niks.firebasestorage.app",
-    messagingSenderId: "504521349704",
-    appId: "1:504521349704:web:15f0305b8cf9da746f567d"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyDECWw2-w_HdtmIFp5eJB1es_h8lpT0Gt4",
+  authDomain: "doominiks-niks.firebaseapp.com",
+  databaseURL: "https://doominiks-niks-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "doominiks-niks",
+  storageBucket: "doominiks-niks.firebasestorage.app",
+  messagingSenderId: "504521349704",
+  appId: "1:504521349704:web:15f0305b8cf9da746f567d",
+  measurementId: "G-1K0XJ24LBL"
+};
   /* =============================================== */
 
   const app = initializeApp(firebaseConfig);
